@@ -1,4 +1,4 @@
-# Project MILK (Medicines Interoperability Logic Kit)
+# Project MILK (Medicines Interoperability and Logic Kit)
 
 Version: Alpha v1.0.5
 
