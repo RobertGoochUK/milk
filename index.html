@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Project MILK</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+  </head>
+  
+<script type='text/javascript'>
+
+function encodeURL() {
+
+	var myElement = document.getElementById("dosage");
+	myElement.value = encodeURIComponent(myElement.value);
+	var myform = document.getElementById("getDosageTextForm");
+	if ( document.getElementById("meth-get").checked == true ) 
+	{
+		myform.method = "get";
+	}
+	else
+	{
+		myform.method = "post";
+	}
+	myform.submit();
+}
+
+function exampleA() {
+	var s = '<dosageInstruction>\n<doseQuantity>\n<value value="1"/>\n<unit value="capsule"/>\n<system value="http://snomed.info/sct"/>\n<code value="732937005"/>\n</doseQuantity>\n<timing>\n<repeat>\n<frequency value="2"/>\n<period value="1"/>\n<periodUnit value="d"/>\n</repeat>\n</timing>\n</dosageInstruction>';
+	document.getElementById("dosage").value = s;
+}
+
+function exampleC() {
+	var xmlhttp, text;
+	xmlhttp = new XMLHttpRequest();
+	xmlhttp.open('GET', 'https://gist.githubusercontent.com/RobertGoochUK/3058adde9517ffb68a62f55112e036f0/raw/d30729c5001f67474ee71f9c5053b201c9e36b3a/example-dosage-inter3.xml', false);
+	xmlhttp.send();
+	document.getElementById("dosage").value = xmlhttp.responseText;
+}
+
+function exampleB() {	
+	var xmlhttp, text;
+	xmlhttp = new XMLHttpRequest();
+	xmlhttp.open('GET', 'https://gist.githubusercontent.com/RobertGoochUK/17e0acb88b76bbcb82b3b6f6c34d7f31/raw/49cad9890a0de477dd9a34a25b460b4d679bb792/example-dosage-simple11.xml', false);
+	xmlhttp.send();
+	document.getElementById("dosage").value = xmlhttp.responseText;
+}
+
+function exampleD() {	
+	var xmlhttp, text;
+	xmlhttp = new XMLHttpRequest();
+	xmlhttp.open('GET', 'https://gist.githubusercontent.com/RobertGoochUK/94b057717c3ade14ae6d6227bd52c213/raw/b4326a587c9d669378bfc080b7a54ba40afe6bb2/examples-dosage-sequential-sequence.xml', false);
+	xmlhttp.send();
+	document.getElementById("dosage").value = xmlhttp.responseText;
+}
+
+function exampleE() {	
+	var xmlhttp, text;
+	xmlhttp = new XMLHttpRequest();
+	xmlhttp.open('GET', 'https://gist.githubusercontent.com/RobertGoochUK/9d73d7c9e6bcba03d0703dd2fb590dea/raw/d4841a789329ee684006b62edaf4fef50e84976b/example-dosage-complex18.xml', false);
+	xmlhttp.send();
+	document.getElementById("dosage").value = xmlhttp.responseText;
+}
+
+</script>
+  <body>
+ 
+<h1>Project MILK: Medicines Interoperability and Logic Toolkit</h1>
+<h3><span style="color:red;">Alpha v1.0.5</span> - These web services are for demonstration or experimental use only. They are not (yet) implemented on production quality infrastructure and are subject to change without notice.</h3>
+	
+<div style="background:#EEEEEE;padding:10px;">
+ 	<h2>Function: getDosageText</h2>
+	<p>Return an appropriate human readable dosage string generated from the given complete FHIR Dosage structure. Used to complete the creation of a FHIR medication profiled resource, e.g. CareConnect-MedicationRequest-1, within the "dosageInstruction.text" element. This process will provide a consistant translation between structured dosage information and a human readable string.</p>
+	<form action="getDosageText.php" id="getDosageTextForm">
+	<table cellspacing=5 cellpadding=5>
+		<tr>
+		<td width=150px valign=top>
+			<p>Stuck for examples? See the <a href="https://developer.nhs.uk/apis/dose-syntax-implementation/dosage-examples-overview.html">examples</a> from the FHIR Dose Syntax Implementation Guidance</p>
+			<p>Some ready-made examples to try and tweak...</p>
+			<p>
+			<button type="button" onclick="exampleA();" style="background:lightgray;padding:10px;width:150px;">Simple Dosage</button>
+			<br/>
+			<button type="button" onclick="exampleB();" style="background:lightgray;padding:10px;width:150px;">MedicationRequest Example 1</button>
+			<br/>
+			<button type="button" onclick="exampleC();" style="background:lightgray;padding:10px;width:150px;">MedicationRequest Example 2</button>
+			<br/>
+			<button type="button" onclick="exampleD();" style="background:lightgray;padding:10px;width:150px;">MedicationRequest Example 3</button>
+			<br/>
+			<button type="button" onclick="exampleE();" style="background:lightgray;padding:10px;width:150px;">MedicationRequest Example 4</button>
+			</p>
+			<p valign="bottom">
+				<input type="submit" onclick='encodeURL();' value="EXECUTE" style="background:lightblue;padding:10px;width:150px;">
+			</p>
+		</td>
+		<td>
+			<textarea rows="30" cols="100" name="dosage" id="dosage"></textarea>
+		</td>
+		</tr>
+		<tr>
+		<td valign="top">HTTP Request Method</td>
+		<td>
+		<input type="radio" name="meth" id="meth-get" value="getx" checked> HTTP GET<br>
+		<input type="radio" name="meth" id="meth-post" value="post"> HTTP POST<br>
+		<p>Switch to an HTTP POST if the size of the dosage instruction exceeds that permitted within a URL (2083 characters).</p>
+		</td>
+		</tr>
+	</table>
+	</form>
+</div>
+
+	<br/>
+	
+ <div style="background:#EEEEEE;padding:10px;">
+	<h2>Function: getConcept</h2>
+	<p>Return information for the given dm+d concept id. Allows someone without dm+d embedded within their software to experiment with dm+d data. Option to return data formatted within a CareConnect profiled resource.</p>
+	<p>
+	<form action="getConcept.php">
+	
+	<table cellspacing=5 cellpadding=5>
+		<tr>
+			<td width=150px>dm+d concept id<br/>VTM, VMP or AMP</td>
+			<td>
+				<select name="id">
+					<option value="90332006">Paracetamol | 90332006</option>
+					<option value="318902004">Ramipril 5mg capsules | 318902004</option>
+					<option value="2887311000001104">Adizem-SR 120mg capsules (Napp Pharmaceuticals Ltd) | 2887311000001104</option>
+				<select>			
+			</td>
+		</tr>
+		<tr>
+			<td>Output Format</td>
+			<td>
+				<input type="radio" name="of" value="complete" checked> Complete<br>
+				<input type="radio" name="of" value="summary"> Summary<br>
+				<input type="radio" name="of" value="careconnect-medication-1"> CareConnect-Medication-1
+			</td>
+		</tr>
+		<tr>
+			<td>Output Type</td>
+			<td>
+				<input type="radio" name="ot" value="json" checked>json<br>
+				<input type="radio" name="ot" value="xml">xml
+			</td>
+		</tr>
+		<tr>
+			<td colspan=3><input type="submit" value="Execute" style="background:lightblue;padding:10px;"></td>
+		</tr>
+	</table>
+	</form>
+	</p>
+</div>
+
+<br/>
+
+<div style="background:#EEEEEE;padding:10px;">
+ 	<h2>Function: getProducts</h2>
+	<p>Return a list of VMP or AMP concepts (name + id) that could fulfil the given dose-based instruction comprising of at least a VTM and coded Route, plus optional data of a coded Form, Trade Family SNOMED code and dose strength quantity and unit of measure. The returned list can be sorted alphabetically or in order of least divisiblity, i.e. least quantity of the product to meet the ordered dose strength. Any additional filtering subject to local requirements, e.g. stock availability, formulary etc. It is not intended that this process auto-selects a single product. A human will ultimately decide on which product to use to fulfil the clinical need.</p>
+	<p>
+	<form action="getProducts.php">
+		<table cellspacing=5 cellpadding=5>
+		<tr>
+		<td width=150px>VTM</td>
+		<td>
+		<select name="vtm">
+			<option value="90332006">Paracetamol | 90332006</option>
+			<option value="318902004">Ramipril | 318902004</option>
+			<option value="59941008">Diltiazem | 59941008</option>
+		<select>
+		</td>
+		<td>(mandatory)</td>
+		</tr>
+		<tr>
+		<td>Route</td>
+		<td>
+		<select name="route">
+			<option value="">(any)</option>
+			<option value="26643006">oral | 26643006</option>
+			<option value="45890007">transdermal | 45890007</option>
+			<option value="37161004">rectal | 37161004</option>
+			<option value="47625008">intravenous | 47625008</option>
+		</select>
+		</td>
+		<td>(mandatory)</td>
+		</tr>
+		<tr>
+		<td>Form</td>
+		<td>
+		<select name="form">
+			<option value="">(any)</option>
+			<option value="428673006">tablet | 428673006</option>
+			<option value="428641000">capsule | 428641000</option>
+			<option value="385023001">oral solution | 385023001</option>
+			<option value="385024007">oral suspension | 385024007</option>
+			<option value="385099005">cream | 385099005</option>
+			<option value="385101003">ointment | 385101003</option>
+			<option value="385054002">modified-release capsule | 385054002</option>
+			<option value="385061003">modified-release tablet | 385061003</option>
+			<option value="385100002">gel | 385100002</option>
+			<option value="385229008">solution for infusion | 385229008</option>
+			<option value="385194003">suppository | 385194003</option>
+			<option value="35367311000001104">soluble tablet | 35367311000001104</option>
+			<option value="85581007">powder | 85581007</option>
+			<option value="385229008">solution for infusion | 385229008</option>
+			<option value="764780001">effervescent tablet | 764780001</option>
+			<option value="447079001">Orodispersible tablet | 447079001</option>
+			</select>
+		</td>
+		<td>(optional)</td>
+		</tr>
+		<tr>
+		<td>Dose Strength</td>
+		<td>
+			<input type="text" name="strength" value="">
+			</br>
+			<select name="uom">
+				<option value="x">milligram</option>
+				<option value="x">gram</option>
+				<option value="x">microgram per millilitre</option>
+				<option value="x">milligram per millilitre</option>
+				<option value="x">percent</option>
+			</select>
+		</td>
+		<td>(optional)</td>
+		</tr>
+		<tr>
+		<td>Trade Family</td>
+		<td><input type="text" name="tf" value=""></td>
+
+		<!-- Adizem-SR | 9198801000001105 -->	
+		
+		<td>(optional)</td>
+		</tr>		
+
+		<tr>
+		<td>Output Type</td>
+		<td>
+		<input type="radio" name="ot" value="json" checked>json<br>
+		<input type="radio" name="ot" value="xml">xml
+		</td>
+		</tr>
+
+		<tr>
+		<td>Sort Order</td>
+		<td>
+		<input type="radio" name="so" value="alpha" checked>alphabetical<br>
+		<input type="radio" name="so" value="divide">least divisibility
+		</td>
+		</tr>
+		
+		<tr>
+		<td colspan=3><input type="submit" value="Execute" style="background:lightblue;padding:10px;"></td>
+		</tr>
+		
+		</table>
+	</form>
+	</p>
+</div>
+
+<br/>
+
+<div style="background:#EEEEEE;padding:10px;">
+ 	<h2>Function: getToBeNamed</h2>
+	<p>Convert a product-based instruction (VMP or AMP) into a dose-based instruction using a VTM.</p>
+	<p>Drafting Notes....The first part is simple by going to the parent VTM. Need to use the Medicines Framework information to identify the safe minimum dataset.</p>
+	<p>
+</div>
+
+	</body>
+</html>
