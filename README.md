@@ -30,17 +30,17 @@ When the output format is “compete” returns all dm+d information for the giv
 
 When the output format is “careconnect-medication-1” returns dm+d information for the given concept that is supported by that CareConnect profiled resource.
 
-## Function: getTextFromDose
+## Function: getDosageText
 
 Return a suitable string to use as the Dosage.text from the structured content within the Dosage structure.
 
 ### Input parameters
 
-Populated Dosage structure in either XML or json format.
+Populated FHIR Dosage structure or dosage within a CareConnect medication related profiled resource, e.g. CareConnect-MedicationRequest-1 in XML format.
 
 ### Output
 
-A string value that the requesting system can use to populate the Dosage.text element to complete the FHIR medication resource. 
+A string value that the requesting system can use to populate the .text element to complete the FHIR medication resource. 
 
 ## Function: getPatientTextFromDose
 
