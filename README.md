@@ -36,7 +36,7 @@ Return a suitable string to use as the Dosage.text from the structured content w
 
 ### Input parameters
 
-Populated FHIR Dosage structure or dosage within a CareConnect medication related profiled resource, e.g. CareConnect-MedicationRequest-1 in XML format.
+"dosage" | Populated FHIR Dosage structure or dosage within a CareConnect medication related profiled resource, e.g. CareConnect-MedicationRequest-1 in XML format.
 
 ### Output
 
