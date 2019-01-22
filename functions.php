@@ -577,7 +577,7 @@ function generateDosagemaxDosePer($dom) {
 			}			
 		}
 		
-		$s .= "to a maximum of " .	$numValue . " " . $numUnit;
+		$s .= "up to a maximum of " .	$numValue . " " . $numUnit;
 		if ( $denValue == "1" ) {
 			$s .= " per " . " " . $denUnit;
 		} else {
@@ -594,7 +594,7 @@ function generateDosagemaxDosePer($dom) {
 		$value = number_format($value);
 		$values = $nodes->item(0)->getElementsByTagName('code');
 		$unit = $values->item(0)->getAttribute('value');			
-		$s .= "to a maximum of " .	$value . " " . $unit . " per dose";
+		$s .= "up to a maximum of " .	$value . " " . $unit . " per dose";
 	}
 	$nodes = $dom->getElementsByTagName('maxDosePerLifetime');
 	if ( $nodes->length > 0 ) {
@@ -603,7 +603,7 @@ function generateDosagemaxDosePer($dom) {
 		$value = number_format($value);
 		$values = $nodes->item(0)->getElementsByTagName('code');
 		$unit = $values->item(0)->getAttribute('value');			
-		$s .= "to a maximum of " .	$value . " " . $unit . " over lifetime of patient";
+		$s .= "up to a maximum of " .	$value . " " . $unit . " over lifetime of patient";
 	}
 	return $s;
 }

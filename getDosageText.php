@@ -9,7 +9,7 @@
 <body>
 
 <?php
-
+    
 include("functions.php");
     
 $xml = urldecode($_REQUEST['dosage']);

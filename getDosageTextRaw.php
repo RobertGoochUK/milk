@@ -1,8 +1,11 @@
 <?php
     
 include("functions.php");
-
+  
 $xml = urldecode($_REQUEST['dosage']);
+  
+// some real voodoo here with the ajax style of calling this function encoded " as \", which is really annoying
+$xml = str_replace('\"','"',$xml);
 
 $dom = new DOMDocument;
 $dom->loadXML($xml);

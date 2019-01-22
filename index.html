@@ -10,6 +10,21 @@
   
 <script type='text/javascript'>
 
+function showHint() {
+    
+    var myElement = document.getElementById("dosage");
+    var s = encodeURIComponent(myElement.value);
+    var uri = "getDosageTextRaw.php?dosage=" + s;
+    var xmlhttp = new XMLHttpRequest();
+    xmlhttp.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+            document.getElementById("txtHint").innerHTML = this.responseText;
+        }
+    };
+    xmlhttp.open("GET", uri, true);
+    xmlhttp.send();
+}
+
 function encodeURL() {
 
 	var myElement = document.getElementById("dosage");
@@ -85,7 +100,9 @@ function exampleE() {
   <body>
  
 <h1>Project MILK: Medicines Interoperability and Logic Toolkit</h1>
-<h3><span style="color:red;">Alpha v1.0.5</span> - These web services are for demonstration or experimental use only. They are not (yet) implemented on production quality infrastructure and are subject to change without notice.</h3>
+<h3><span style="color:red;">Alpha v1.0.5</span></h3>
+<p>These web services are for demonstration or experimental use only.</p>
+<p>They are not (yet) implemented on production quality infrastructure and are subject to change without notice.</p>
 	
 <div style="background:#EEEEEE;padding:10px;">
  	<h2>Function: getDosageText</h2>
@@ -109,27 +126,39 @@ function exampleE() {
 			</p>
 			<p valign="bottom">
 				<input type="submit" onclick='encodeURL();' value="EXECUTE" style="background:lightblue;padding:10px;width:150px;">
-                <input type="submit" onclick='encodeURLRaw();' value="RAW (in dev)" style="background:lightblue;padding:10px;width:150px;">
+                <!--<input type="submit" onclick='encodeURLRaw();' value="RAW (in dev)" style="background:lightblue;padding:10px;width:150px;">-->
+                
 			</p>
 		</td>
 		<td>
-			<textarea rows="30" cols="100" name="dosage" id="dosage"></textarea>
+			<textarea rows="35" cols="100" name="dosage" id="dosage"></textarea>
 		</td>
 		</tr>
+        <tr>
+            <td>
+                <button type="button" onclick="showHint()" style="background:lightblue;padding:10px;width:150px;">EXECUTE (just text)</button>
+            </td>
+            <td>
+                <textarea rows="3" cols="100" name="txtHint" id="txtHint"></textarea>
+            </td>
+        </tr>
 		<tr>
 		<td valign="top">HTTP Request Method</td>
 		<td>
-		<input type="radio" name="meth" id="meth-get" value="get" checked> HTTP GET<br>
-		<input type="radio" name="meth" id="meth-post" value="post"> HTTP POST<br>
+		<input type="radio" name="meth" id="meth-get" value="get" checked>HTTP GET<br>
+		<input type="radio" name="meth" id="meth-post" value="post">HTTP POST<br>
 		<p>Switch to an HTTP POST if the size of the dosage instruction exceeds that permitted within a URL (2083 characters).</p>
 		</td>
 		</tr>
 	</table>
 	</form>
+    
 </div>
 
 	<br/>
-	
+
+
+    
  <div style="background:#EEEEEE;padding:10px;">
 	<h2>Function: getConcept</h2>
 	<p>Return information for the given dm+d concept id. Allows someone without dm+d embedded within their software to experiment with dm+d data. Option to return data formatted within a CareConnect profiled resource.</p>
