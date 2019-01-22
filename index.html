@@ -15,6 +15,7 @@ function encodeURL() {
 	var myElement = document.getElementById("dosage");
 	myElement.value = encodeURIComponent(myElement.value);
 	var myform = document.getElementById("getDosageTextForm");
+    myform.action = "getDosageText.php";
 	if ( document.getElementById("meth-get").checked == true ) 
 	{
 		myform.method = "get";
@@ -24,6 +25,23 @@ function encodeURL() {
 		myform.method = "post";
 	}
 	myform.submit();
+}
+
+function encodeURLRaw() {
+    
+    var myElement = document.getElementById("dosage");
+    myElement.value = encodeURIComponent(myElement.value);
+    var myform = document.getElementById("getDosageTextForm");
+    myform.action = "getDosageTextRaw.php";
+    if ( document.getElementById("meth-get").checked == true )
+    {
+        myform.method = "get";
+    }
+    else
+    {
+        myform.method = "post";
+    }
+    myform.submit();
 }
 
 function exampleA() {
@@ -72,7 +90,7 @@ function exampleE() {
 <div style="background:#EEEEEE;padding:10px;">
  	<h2>Function: getDosageText</h2>
 	<p>Return an appropriate human readable dosage string generated from the given complete FHIR Dosage structure. Used to complete the creation of a FHIR medication profiled resource, e.g. CareConnect-MedicationRequest-1, within the "dosageInstruction.text" element. This process will provide a consistant translation between structured dosage information and a human readable string.</p>
-	<form action="getDosageText.php" id="getDosageTextForm">
+	<form id="getDosageTextForm">
 	<table cellspacing=5 cellpadding=5>
 		<tr>
 		<td width=150px valign=top>
@@ -91,6 +109,7 @@ function exampleE() {
 			</p>
 			<p valign="bottom">
 				<input type="submit" onclick='encodeURL();' value="EXECUTE" style="background:lightblue;padding:10px;width:150px;">
+                <input type="submit" onclick='encodeURLRaw();' value="RAW (in dev)" style="background:lightblue;padding:10px;width:150px;">
 			</p>
 		</td>
 		<td>
@@ -100,7 +119,7 @@ function exampleE() {
 		<tr>
 		<td valign="top">HTTP Request Method</td>
 		<td>
-		<input type="radio" name="meth" id="meth-get" value="getx" checked> HTTP GET<br>
+		<input type="radio" name="meth" id="meth-get" value="get" checked> HTTP GET<br>
 		<input type="radio" name="meth" id="meth-post" value="post"> HTTP POST<br>
 		<p>Switch to an HTTP POST if the size of the dosage instruction exceeds that permitted within a URL (2083 characters).</p>
 		</td>

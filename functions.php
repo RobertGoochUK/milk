@@ -1,4 +1,6 @@
 <?php
+
+define("SEPARATOR", " - ");
     
 function valuesetUnitsOfTime($value)
 {
@@ -803,5 +805,4 @@ function createCUIDosageString($arr, $option) {
 	$s .= rtrim($part, SEPARATOR);
 	return $s;
 }
-
 ?>
