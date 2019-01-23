@@ -91,6 +91,8 @@
             }
             if ( $output == "html" ) {
                 echo "<br/>";
+            } else {
+                echo "  ";
             }
         }
         echo createCUIDosageString($dosageStructureArray, $output);

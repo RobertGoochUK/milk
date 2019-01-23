@@ -17,9 +17,6 @@
       location = "group:functions.php">
    </FileRef>
    <FileRef
-      location = "group:getDosageTextRaw.php">
-   </FileRef>
-   <FileRef
       location = "container:index.html">
    </FileRef>
 </Workspace>
