@@ -7,6 +7,20 @@ A collection of web services to support medicines interoperability between NHS c
 ## Temporary Implementation (will soon be hosted on AWS)
 http://mklacrosse.co.uk/milk/
 
+## Function: getDosageText
+
+Return a suitable string to use as the Dosage.text from the structured content within the Dosage structure.
+
+### Input parameters
+
+"d" | Populated FHIR Dosage structure or dosage within a CareConnect medication related profiled resource, e.g. CareConnect-MedicationRequest-1 in XML format.
+
+"o" | Output format. "text" returns plain text. "html" returns multi-line formatted HTML aligned with CUI guidance. "htmlinline" returns in-line formatted HTML aligned with CUI guidance.
+
+### Output
+
+A string value that the requesting system can use to populate the .text element to complete the FHIR medication resource, or HTML to demonstrate how the instruction may be presented within a clinical system.
+
 ## Function: getConcept
 
 Return information for the given dm+d concept id.
@@ -23,26 +37,14 @@ Return information for the given dm+d concept id.
 
 When the output format is “summary” returns;
 
-  * Concept name
-  * Concept description
-  * Concept code
-  * Plus other stuff deemed required for the most generic use cases, e.g. maybe some flag information such as if invalid?
+* Concept name
+* Concept description
+* Concept code
+* Plus other stuff deemed required for the most generic use cases, e.g. maybe some flag information such as if invalid?
 
 When the output format is “compete” returns all dm+d information for the given concept. 
 
 When the output format is “careconnect-medication-1” returns dm+d information for the given concept that is supported by that CareConnect profiled resource.
-
-## Function: getDosageText
-
-Return a suitable string to use as the Dosage.text from the structured content within the Dosage structure.
-
-### Input parameters
-
-"dosage" | Populated FHIR Dosage structure or dosage within a CareConnect medication related profiled resource, e.g. CareConnect-MedicationRequest-1 in XML format.
-
-### Output
-
-A string value that the requesting system can use to populate the .text element to complete the FHIR medication resource. 
 
 ## Function: getPatientTextFromDose
 
