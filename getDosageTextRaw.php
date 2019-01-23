@@ -1,7 +1,8 @@
 <?php
     
 include("functions.php");
-  
+
+$output = ($_REQUEST['o'] == "html" ? "html" : "text");
 $xml = urldecode($_REQUEST['dosage']);
   
 // some real voodoo here with the ajax style of calling this function encoded " as \", which is really annoying
@@ -71,5 +72,20 @@ foreach ($dosageInstructions as $instruction)
 	);
 	$completeInstructionString .= createInstructionString($dosageStructureArray);
 }
-echo $completeMedicationString . $completeInstructionString;
+    
+    if ( $output == "text" ) {
+        echo $completeMedicationString . $completeInstructionString;
+    } else {
+        if ( $completeMedicationString > "" ) {
+            echo "<span style='font-weight:bold;'>" . $medication . "</span>";
+            if ( $brand > "" ) {
+                echo " - " . strtoupper($brand);
+            }
+            if ( $form > "" ) {
+                echo " - " . $form;
+            }
+            echo "<br/>";
+        }
+        echo createCUIDosageString($dosageStructureArray, "MULTI");
+    }
 ?>

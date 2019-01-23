@@ -727,14 +727,14 @@ function createCUIDosageString($arr, $option) {
 	$part = "";
 	$sep = SEPARATOR;
 	
-	if ( $option == "MULTI" ) {
+	if ( $option == "html" ) {
 		$sep = "<br/>";
 	}
 	// method
 	if ( $arr["method"] > "" ) { 
 		if ( $s > "" ) { $s .= $sep; }
-		if ( $option != "SINGLE" ) {
-			$s .= "<span class='medsLabelCUI'>METHOD </span>"; 
+		if ( $option == "html" ) {
+            $s .= "<span style='font-family:courier; font-size:smaller; font-weight:bold; color:blue;'>METHOD </span>";
 		}
 		$s .= $arr["method"]; 
 	}
@@ -743,7 +743,7 @@ function createCUIDosageString($arr, $option) {
 	if ( $arr["doseQuantity"] > "" || $arr["doseRange"] > "" || $arr["rateRatio"] > "" || $arr["rateRange"] > "" || $arr["rateQuantity"] > "" || $arr["duration"] > ""  ) 
 	{
 		if ( $s > "" ) { $s .= $sep; }
-		$s .= "<span class='medsLabelCUI'>DOSE </span>";
+		$s .= "<span style='font-family:courier; font-size:smaller;font-weight:bold;color:blue;'>DOSE </span>";
 		$part = "";
 		if ( $arr["doseQuantity"] > "" ) { $part .= $arr["doseQuantity"] . SEPARATOR ; }
 		if ( $arr["doseRange"] > "" ) { $part .= $arr["doseRange"] . SEPARATOR ; }
@@ -757,8 +757,8 @@ function createCUIDosageString($arr, $option) {
 	// route
 	if ( $arr["route"] > "" ) { 
 		if ( $s > "" ) { $s .= $sep; }
-		if ( $option != "SINGLE" ) {
-			$s .= "<span class='medsLabelCUI'>ROUTE </span>";
+		if ( $option == "html" ) {
+			$s .= "<span style='font-family:courier; font-size:smaller;font-weight:bold;color:blue;'>ROUTE </span>";
 		} 
 		$s .= $arr["route"] ; 
 	}
@@ -766,8 +766,8 @@ function createCUIDosageString($arr, $option) {
 	//site
 	if ( $arr["site"] > "" ) { 
 		if ( $s > "" ) { $s .= $sep; }
-		if ( $option != "SINGLE" ) {
-			$s .= "<span class='medsLabelCUI'>SITE </span>";
+		if ( $option == "html" ) {
+			$s .= "<span style='font-family:courier; font-size:smaller;font-weight:bold;color:blue;'>SITE </span>";
 		}
 		$s .= $arr["site"] ; 
 	}
@@ -776,8 +776,8 @@ function createCUIDosageString($arr, $option) {
 	if ( $arr["timingWhen"] > "" || $arr["timingDayOfWeek"] > "" || $arr["timingTimeOfDay"] > "" || $arr["timingFrequency"] > "" || $arr["asNeeded"] > "" || $arr["timingBounds"] > "" || $arr["timingCount"] > "" || $arr["timingEvent"] > "" ) 
 	{
 		if ( $s > "" ) { $s .= $sep; }
-		if ( $option != "SINGLE" ) {
-			$s .= "<span class='medsLabelCUI'>TIMING </span>";
+		if ( $option == "html" ) {
+			$s .= "<span style='font-family:courier; font-size:smaller;font-weight:bold;color:blue;'>TIMING </span>";
 		}
 		$part = "";
 		if ( $arr["timingWhen"] > "" ) { $part .= $arr["timingWhen"] . SEPARATOR ; }

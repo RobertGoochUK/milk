@@ -6,159 +6,99 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="">
     <meta name="author" content="">
+    <style>
+        .gray-small-button { background:lightgray;padding:10px; }
+        .outputBox { border-style:solid; border-width:1px; width:600px; padding:10px; font-family:courier; }
+        .outputCUIBox { border-style:solid; border-width:1px; width:600px; padding:10px; font-family:Helvetica; }
+    </style>
   </head>
   
 <script type='text/javascript'>
 
-function showHint() {
+function callGetDosageTextForm(out,divName) {
     
     var myElement = document.getElementById("dosage");
-    var s = encodeURIComponent(myElement.value);
-    var uri = "getDosageTextRaw.php?dosage=" + s;
+    var uri = "getDosageText.php?o=" + out + "&d=" + encodeURIComponent(myElement.value);
     var xmlhttp = new XMLHttpRequest();
     xmlhttp.onreadystatechange = function() {
         if (this.readyState == 4 && this.status == 200) {
-            document.getElementById("txtHint").innerHTML = this.responseText;
+            document.getElementById(divName).innerHTML = this.responseText;
         }
     };
     xmlhttp.open("GET", uri, true);
     xmlhttp.send();
 }
 
-function encodeURL() {
-
-	var myElement = document.getElementById("dosage");
-	myElement.value = encodeURIComponent(myElement.value);
-	var myform = document.getElementById("getDosageTextForm");
-    myform.action = "getDosageText.php";
-	if ( document.getElementById("meth-get").checked == true ) 
-	{
-		myform.method = "get";
-	}
-	else
-	{
-		myform.method = "post";
-	}
-	myform.submit();
-}
-
-function encodeURLRaw() {
-    
-    var myElement = document.getElementById("dosage");
-    myElement.value = encodeURIComponent(myElement.value);
-    var myform = document.getElementById("getDosageTextForm");
-    myform.action = "getDosageTextRaw.php";
-    if ( document.getElementById("meth-get").checked == true )
-    {
-        myform.method = "get";
+function showExample() {
+    var uri = document.getElementById("examplesList").value;
+    if ( uri > "" ) {
+        xmlhttp = new XMLHttpRequest();
+        xmlhttp.open('GET', uri, false);
+        xmlhttp.send();
+        document.getElementById("dosage").value = xmlhttp.responseText;
+    } else {
+        document.getElementById("dosage").value = "";
     }
-    else
-    {
-        myform.method = "post";
-    }
-    myform.submit();
-}
-
-function exampleA() {
-	var s = '<dosageInstruction>\n<doseQuantity>\n<value value="1"/>\n<unit value="capsule"/>\n<system value="http://snomed.info/sct"/>\n<code value="732937005"/>\n</doseQuantity>\n<timing>\n<repeat>\n<frequency value="2"/>\n<period value="1"/>\n<periodUnit value="d"/>\n</repeat>\n</timing>\n</dosageInstruction>';
-	document.getElementById("dosage").value = s;
-}
-
-function exampleC() {
-	var xmlhttp, text;
-	xmlhttp = new XMLHttpRequest();
-	xmlhttp.open('GET', 'https://gist.githubusercontent.com/RobertGoochUK/3058adde9517ffb68a62f55112e036f0/raw/d30729c5001f67474ee71f9c5053b201c9e36b3a/example-dosage-inter3.xml', false);
-	xmlhttp.send();
-	document.getElementById("dosage").value = xmlhttp.responseText;
-}
-
-function exampleB() {	
-	var xmlhttp, text;
-	xmlhttp = new XMLHttpRequest();
-	xmlhttp.open('GET', 'https://gist.githubusercontent.com/RobertGoochUK/17e0acb88b76bbcb82b3b6f6c34d7f31/raw/49cad9890a0de477dd9a34a25b460b4d679bb792/example-dosage-simple11.xml', false);
-	xmlhttp.send();
-	document.getElementById("dosage").value = xmlhttp.responseText;
-}
-
-function exampleD() {	
-	var xmlhttp, text;
-	xmlhttp = new XMLHttpRequest();
-	xmlhttp.open('GET', 'https://gist.githubusercontent.com/RobertGoochUK/94b057717c3ade14ae6d6227bd52c213/raw/b4326a587c9d669378bfc080b7a54ba40afe6bb2/examples-dosage-sequential-sequence.xml', false);
-	xmlhttp.send();
-	document.getElementById("dosage").value = xmlhttp.responseText;
-}
-
-function exampleE() {	
-	var xmlhttp, text;
-	xmlhttp = new XMLHttpRequest();
-	xmlhttp.open('GET', 'https://gist.githubusercontent.com/RobertGoochUK/9d73d7c9e6bcba03d0703dd2fb590dea/raw/d4841a789329ee684006b62edaf4fef50e84976b/example-dosage-complex18.xml', false);
-	xmlhttp.send();
-	document.getElementById("dosage").value = xmlhttp.responseText;
 }
 
 </script>
-  <body>
- 
+
+<body>
+    
 <h1>Project MILK: Medicines Interoperability and Logic Toolkit</h1>
+
 <h3><span style="color:red;">Alpha v1.0.5</span></h3>
-<p>These web services are for demonstration or experimental use only.</p>
-<p>They are not (yet) implemented on production quality infrastructure and are subject to change without notice.</p>
+
+<p>These web services are for demonstration or experimental use only.<br/>They are not (yet) implemented on production quality infrastructure and are subject to change without notice.</p>
 	
 <div style="background:#EEEEEE;padding:10px;">
  	<h2>Function: getDosageText</h2>
-	<p>Return an appropriate human readable dosage string generated from the given complete FHIR Dosage structure. Used to complete the creation of a FHIR medication profiled resource, e.g. CareConnect-MedicationRequest-1, within the "dosageInstruction.text" element. This process will provide a consistant translation between structured dosage information and a human readable string.</p>
-	<form id="getDosageTextForm">
-	<table cellspacing=5 cellpadding=5>
-		<tr>
-		<td width=150px valign=top>
-			<p>Stuck for examples? See the <a href="https://developer.nhs.uk/apis/dose-syntax-implementation/dosage-examples-overview.html">examples</a> from the FHIR Dose Syntax Implementation Guidance</p>
-			<p>Some ready-made examples to try and tweak...</p>
-			<p>
-			<button type="button" onclick="exampleA();" style="background:lightgray;padding:10px;width:150px;">Simple Dosage</button>
-			<br/>
-			<button type="button" onclick="exampleB();" style="background:lightgray;padding:10px;width:150px;">MedicationRequest Example 1</button>
-			<br/>
-			<button type="button" onclick="exampleC();" style="background:lightgray;padding:10px;width:150px;">MedicationRequest Example 2</button>
-			<br/>
-			<button type="button" onclick="exampleD();" style="background:lightgray;padding:10px;width:150px;">MedicationRequest Example 3</button>
-			<br/>
-			<button type="button" onclick="exampleE();" style="background:lightgray;padding:10px;width:150px;">MedicationRequest Example 4</button>
-			</p>
-			<p valign="bottom">
-				<input type="submit" onclick='encodeURL();' value="EXECUTE" style="background:lightblue;padding:10px;width:150px;">
-                <!--<input type="submit" onclick='encodeURLRaw();' value="RAW (in dev)" style="background:lightblue;padding:10px;width:150px;">-->
-                
-			</p>
-		</td>
-		<td>
-			<textarea rows="35" cols="100" name="dosage" id="dosage"></textarea>
-		</td>
-		</tr>
-        <tr>
-            <td>
-                <button type="button" onclick="showHint()" style="background:lightblue;padding:10px;width:150px;">EXECUTE (just text)</button>
-            </td>
-            <td>
-                <textarea rows="3" cols="100" name="txtHint" id="txtHint"></textarea>
-            </td>
-        </tr>
-		<tr>
-		<td valign="top">HTTP Request Method</td>
-		<td>
-		<input type="radio" name="meth" id="meth-get" value="get" checked>HTTP GET<br>
-		<input type="radio" name="meth" id="meth-post" value="post">HTTP POST<br>
-		<p>Switch to an HTTP POST if the size of the dosage instruction exceeds that permitted within a URL (2083 characters).</p>
-		</td>
-		</tr>
-	</table>
-	</form>
+	<p>Returns an appropriate human readable dosage string generated from the given FHIR Dosage structure. Use to populate the .text structure within profiled resources like <a href="https://fhir.hl7.org.uk/STU3/StructureDefinition/CareConnect-MedicationRequest-1">CareConnect-MedicationRequest-1</a>.</p>
+    
+        <p>
+        Try <a href="https://developer.nhs.uk/apis/dose-syntax-implementation/dosage-examples-overview.html">examples</a> from the Dose Syntax Implementation Guidance:
+            <select name="examplesList" id="examplesList" onChange='showExample();'>
+                <option value="">(clear)</option>
+                <option value="https://gist.githubusercontent.com/RobertGoochUK/2b88fe64156c2d3c788328463d7a4a5d/raw/">[Product] Oxytetracycline, oral</option>
+                <option value="https://gist.githubusercontent.com/RobertGoochUK/3d90859ce98769ec9b6643cfccdcc65a/raw/">[Dose] Oxytetracycline, oral</option>
+                <option value="https://gist.githubusercontent.com/RobertGoochUK/b80afd58861658643c8265d3cb622979/raw/">[Product] Omeprazole, gastro-resistant, oral</option>
+                <option value="https://gist.githubusercontent.com/RobertGoochUK/3058adde9517ffb68a62f55112e036f0/raw/">[Dose] Salbutamol, inhalation</option>
+                <option value="https://gist.githubusercontent.com/RobertGoochUK/17e0acb88b76bbcb82b3b6f6c34d7f31/raw/">[Dose] Flucloxacillin, oral</option>
+                <option value="https://gist.githubusercontent.com/RobertGoochUK/94b057717c3ade14ae6d6227bd52c213/raw/">[Dose] Prednisolone, tapered</option>
+            <select>
+            <br/>
+        Or just type/paste valid FHIR XML into the box below.
+        </p>
+        <p>
+        <textarea rows="30" cols="100" name="dosage" id="dosage"></textarea>
+        </p>
+        <p>
+        Now execute the web service and see the returned generated text string.
+        </p>
+        <p>
+        <button type="button" onclick="callGetDosageTextForm('text','divOutputBox')" class="gray-small-button">Plain Text</button>
+        &nbsp;
+        <span style="font-family:courier;">{base_url}/getDosageText.php?o=text&d={urlencoded FHIR XML}</span>
+        </p>
+        <div name="divOutputBox" id="divOutputBox" class="outputBox"></div>
+        <p>
+        Now execute the web service and request a formatted HTML response aligned with CUI guidance.
+        </p>
+        <p>
+        <button type="button" onclick="callGetDosageTextForm('html','divOutputCUIBox1')" class="gray-small-button">HTML Multi Line</button>
+        &nbsp;<span style="font-family:courier;">{base_url}/getDosageText.php?o=html&d={urlencoded FHIR XML}</span>
+        </p>
+        <div name="divOutputCUIBox1" id="divOutputCUIBox1" class="outputCUIBox"></div>
+        <p>
+        <button type="button" onclick="callGetDosageTextForm('htmlinline','divOutputCUIBox2')" class="gray-small-button">HTML Single Line</button>
+        &nbsp;<span style="font-family:courier;">{base_url}/getDosageText.php?o=htmlinline&d={urlencoded FHIR XML}</span>
+        </p>
+        <div name="divOutputCUIBox2" id="divOutputCUIBox2" class="outputCUIBox"></div>
     
 </div>
 
 	<br/>
 
-
-    
  <div style="background:#EEEEEE;padding:10px;">
 	<h2>Function: getConcept</h2>
 	<p>Return information for the given dm+d concept id. Allows someone without dm+d embedded within their software to experiment with dm+d data. Option to return data formatted within a CareConnect profiled resource.</p>
