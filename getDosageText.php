@@ -6,8 +6,8 @@
     if ( $output == "" ) {
         $output = "text";
     }
-    $xml = urldecode($_REQUEST['d']);
     
+    $xml = urldecode($_REQUEST['d']);
     // some real voodoo here with the ajax style of calling this function encoded " as \", which is really annoying
     $xml = str_replace('\"','"',$xml);
     
@@ -17,11 +17,11 @@
     $completeInstructionString = "";
     
     $medication = generateMedicationName($dom);
-    $brand = generateMedicationBrand($dom);
+    //$brand = generateMedicationBrand($dom);
     $form = generateMedicationForm($dom);
     
     if ( $medication > "" ) { $completeMedicationString .= $medication . SEPARATOR ; }
-    if ( $brand > "" ) { $completeMedicationString .= strtoupper ($brand) . SEPARATOR ; }
+    //if ( $brand > "" ) { $completeMedicationString .= strtoupper ($brand) . SEPARATOR ; }
     if ( $form > "" ) { $completeMedicationString .= $form . SEPARATOR ; }
     
     $dosageInstructions = $dom->getElementsByTagName('dosageInstruction');
@@ -59,12 +59,12 @@
                                       "rateRange" => generateDosageRateRange($instruction),
                                       "rateQuantity" => generateDosageRateQuantity($instruction),
                                       "duration" => generateDosageDuration($instruction),
-                                      "route" => generateDosageRoute($instruction),
-                                      "site" => generateDosageSite($instruction),
+                                      "timingFrequency" => generateDosageFrequency($instruction),
                                       "timingWhen" =>  generateDosageWhen($instruction),
                                       "timingDayOfWeek" =>  generateDosageDayOfWeek($instruction),
                                       "timingTimeOfDay" => generateDosageTimeOfDay($instruction),
-                                      "timingFrequency" => generateDosageFrequency($instruction),
+                                      "route" => generateDosageRoute($instruction),
+                                      "site" => generateDosageSite($instruction),
                                       "asNeeded" => generateDosageAsNeeded($instruction),
                                       "timingBounds" => generateDosageTimingBounds($instruction),
                                       "timingCount" =>  generateDosageTimingCount($instruction),

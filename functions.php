@@ -701,8 +701,7 @@ function createInstructionString($arr) {
 	if ( $arr["rateRange"] > "" ) { $s .= $arr["rateRange"] . SEPARATOR ; }
 	if ( $arr["rateQuantity"] > "" ) { $s .= $arr["rateQuantity"] . SEPARATOR ; }
 	if ( $arr["duration"] > "" ) { $s .= $arr["duration"] . SEPARATOR ; }
-	if ( $arr["route"] > "" ) { $s .= $arr["route"] . SEPARATOR ; }
-	if ( $arr["site"] > "" ) { $s .= $arr["site"] . SEPARATOR ; }
+    if ( $arr["timingFrequency"] > "" ) { $s .= $arr["timingFrequency"] . SEPARATOR ; }
 	if ( $arr["timingWhen"] > "" ) { $s .= $arr["timingWhen"] . SEPARATOR ; }
 	if ( $arr["timingDayOfWeek"] > "" && $arr["timingTimeOfDay"] > "" ) {
 		$s .= $arr["timingDayOfWeek"] . " " . $arr["timingTimeOfDay"] . SEPARATOR ;
@@ -711,7 +710,8 @@ function createInstructionString($arr) {
 		if ( $arr["timingDayOfWeek"] > "" ) {$s .= $arr["timingDayOfWeek"] . SEPARATOR ; }
 		if ( $arr["timingTimeOfDay"] > "" ) { $s .= $arr["timingTimeOfDay"] . SEPARATOR ; }
 	}
-	if ( $arr["timingFrequency"] > "" ) { $s .= $arr["timingFrequency"] . SEPARATOR ; }
+    if ( $arr["route"] > "" ) { $s .= $arr["route"] . SEPARATOR ; }
+    if ( $arr["site"] > "" ) { $s .= $arr["site"] . SEPARATOR ; }
 	if ( $arr["asNeeded"] > "" ) { $s .= $arr["asNeeded"] . SEPARATOR ; }
 	if ( $arr["timingBounds"] > "" ) { $s .= $arr["timingBounds"] . SEPARATOR ; }
 	if ( $arr["timingCount"] > "" ) { $s .= $arr["timingCount"] . SEPARATOR ; }
@@ -780,6 +780,7 @@ function createCUIDosageString($arr, $option) {
 			$s .= "<span style='font-family:courier; font-size:smaller;font-weight:bold;color:blue;'>TIMING </span>";
 		}
 		$part = "";
+        if ( $arr["timingFrequency"] > "" ) { $part .= $arr["timingFrequency"] . SEPARATOR ; }
 		if ( $arr["timingWhen"] > "" ) { $part .= $arr["timingWhen"] . SEPARATOR ; }
 		if ( $arr["timingDayOfWeek"] > "" && $arr["timingTimeOfDay"] > "" ) {
 			$part .= $arr["timingDayOfWeek"] . " " . $arr["timingTimeOfDay"] . SEPARATOR ;
@@ -788,7 +789,6 @@ function createCUIDosageString($arr, $option) {
 			if ( $arr["timingDayOfWeek"] > "" ) { $part .= $arr["timingDayOfWeek"] . SEPARATOR ; }
 			if ( $arr["timingTimeOfDay"] > "" ) { $part .= $arr["timingTimeOfDay"] . SEPARATOR ; }
 		}
-		if ( $arr["timingFrequency"] > "" ) { $part .= $arr["timingFrequency"] . SEPARATOR ; }
 		if ( $arr["asNeeded"] > "" ) { $part .= $arr["asNeeded"] . SEPARATOR ; }
 		if ( $arr["timingBounds"] > "" ) { $part .= $arr["timingBounds"] . SEPARATOR ; }
 		if ( $arr["timingCount"] > "" ) { $part .= $arr["timingCount"] . SEPARATOR ; }

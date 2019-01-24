@@ -1,5 +1,5 @@
 <?php
-
+    
 $id = $_REQUEST['id'];
 $format = $_REQUEST['of'];
 $type = $_REQUEST['ot'];

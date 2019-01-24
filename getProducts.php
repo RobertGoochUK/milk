@@ -1,7 +1,14 @@
 <?php
 
-$id = $_REQUEST['id'];
+$xml = urldecode($_REQUEST['d']);
+// some real voodoo here with the ajax style of calling this function encoded " as \", which is really annoying
+$xml = str_replace('\"','"',$xml);
+
 $type = $_REQUEST['ot'];
+$sortOrder = $_REQUEST['so'];
+    
+    
+$id = $_REQUEST['id'];
 $form = $_REQUEST['form'];
 $route = $_REQUEST['route'];
 
