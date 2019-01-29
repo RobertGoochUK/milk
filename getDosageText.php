@@ -31,9 +31,12 @@
         $multiSequence = true;
     }
     
+    $xxx = array();
+    
     $firstInstruction = true;
     foreach ($dosageInstructions as $instruction)
     {
+        $sequenceType = "";
         if ( $multiSequence ) {
             if ( $firstInstruction ) {
                 $firstInstruction = false;
@@ -42,9 +45,11 @@
                 if ( $nodes->length > 0 ) {
                     $seq = (int)$nodes->item(0)->getAttribute('value');
                     if ( $seq > $lastSeq ) {
-                        $completeInstructionString .= " *then* ";
+                        $completeInstructionString .= ", then ";
+                        $sequenceType = "SEQUENTIAL";
                     } else {
-                        $completeInstructionString .= " *and* ";
+                        $completeInstructionString .= ", and ";
+                        $sequenceType = "CONCURRENT";
                     }
                     $lastSeq = $seq;
                 }
@@ -52,6 +57,7 @@
         }
         
         $dosageStructureArray = array(
+                                      "sequenceType" => $sequenceType,
                                       "method" => generateDosageMethod($instruction),
                                       "doseQuantity" => generateDosageDoseQuantity($instruction),
                                       "doseRange" => generateDosageDoseRange($instruction),
@@ -74,6 +80,8 @@
                                       "patientInstruction" => generateDosagePatientInstructions($instruction),
                                       );
         $completeInstructionString .= createInstructionString($dosageStructureArray);
+    
+        array_push($xxx, $dosageStructureArray);
     }
     
     if ( $output == "text" ) {
@@ -95,6 +103,6 @@
                 echo "  ";
             }
         }
-        echo createCUIDosageString($dosageStructureArray, $output);
+        echo createCUIDosageString($xxx, $output);
     }
 ?>

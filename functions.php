@@ -28,10 +28,10 @@ function valuesetDaysOfWeek($value)
 
 function valuesetEventTiming($value)
 {
-	if ( $value == "MORN" ) { return "in the morning"; }
-	if ( $value == "AFT" ) { return "in the afternoon"; }
-	if ( $value == "EVE" ) { return "in the evening"; }
-	if ( $value == "NIGHT" ) { return "at night"; }
+	if ( $value == "MORN" ) { return "during the morning"; }
+	if ( $value == "AFT" ) { return "during the afternoon"; }
+	if ( $value == "EVE" ) { return "during the evening"; }
+	if ( $value == "NIGHT" ) { return "during the night"; }
 	if ( $value == "PHS" ) { return "after sleep"; }
 	if ( $value == "HS" ) { return "before sleep"; }
 	if ( $value == "WAKE" ) { return "after waking"; }
@@ -40,11 +40,11 @@ function valuesetEventTiming($value)
 	if ( $value == "CD" ) { return "at lunch"; }
 	if ( $value == "CV" ) { return "at dinner"; }
 	if ( $value == "AC" ) { return "before a meal"; }
-	if ( $value == "ACM" ) { return "before reakfast"; }
+	if ( $value == "ACM" ) { return "before beakfast"; }
 	if ( $value == "ACD" ) { return "before lunch"; }
 	if ( $value == "ACV" ) { return "before dinner"; }
 	if ( $value == "PC" ) { return "after a meal"; }
-	if ( $value == "PCM" ) { return "after reakfast"; }
+	if ( $value == "PCM" ) { return "after breakfast"; }
 	if ( $value == "PCD" ) { return "after lunch"; }
 	if ( $value == "PCV" ) { return "after dinner"; }	
 	return $value;
@@ -261,23 +261,30 @@ function generateDosageSite($dom) {
 function generateDosageWhen($dom) {
 	$s = "";
 	$mins = "";
+    // handle any offset
 	$offsets = $dom->getElementsByTagName('offset');
-	foreach ($offsets as $offset) 
-	{
-		$mins = $offset->getAttribute('value');
-	}
-	if ( $mins != "" ) 
-	{
-		$s .= valueDaysHoursMinutes($mins);
-	}
+    if ( $offsets->length > 0 ) {
+        $mins = $offsets->item(0)->getAttribute('value');
+        if ( $mins != "" )
+        {
+            $s .= valueDaysHoursMinutes($mins);
+        }
+    }
+    
+    // loop through any 'when'
 	$whens = $dom->getElementsByTagName('when');
+    $count = 1;
+    $maxCount = (int)$whens->length;
 	foreach ($whens as $when) 
 	{
 		$value = $when->getAttribute('value');
-		$s .= valuesetEventTiming($value) . ", ";
-	}
-	if ( $s > "" ) {
-		$s = rtrim($s, ", "); // . SEPARATOR;
+        $s .= valuesetEventTiming($value);
+        if ( $count == $maxCount - 1 ) {
+            $s .= " and ";
+        } elseif ( $count < $maxCount ) {
+            $s .= ", ";
+        }
+        $count += 1;
 	}
 	return $s;
 }
@@ -285,30 +292,42 @@ function generateDosageWhen($dom) {
 function generateDosageDayOfWeek($dom) {
 	$s = "";
 	$days = $dom->getElementsByTagName('dayOfWeek');
+    $count = 1;
+    $maxCount = (int)$days->length;
 	foreach ($days as $day) 
 	{
 		$value = $day->getAttribute('value');
-		$value = valuesetDaysOfWeek($value);
-		// TO DO use comma to separate unless the 2nd last instance then use " and "
-		$s .= $value . ", ";
+        $s .= valuesetDaysOfWeek($value);
+        if ( $count == $maxCount - 1 ) {
+            $s .= " and ";
+        } elseif ( $count < $maxCount ) {
+            $s .= ", ";
+        }
+        $count += 1;
 	}
-	if ( $s > "" ) {
-		$s = "on " . rtrim($s, ", "); 
-	}
+    if ( $s > "" ) {
+        $s = "on " . $s;
+    }
 	return $s;	
 }
 
 function generateDosageTimeOfDay($dom) {
 	$s = "";
 	$times = $dom->getElementsByTagName('timeOfDay');
+    $count = 1;
+    $maxCount = (int)$times->length;
 	foreach ($times as $time) 
 	{
-		$value = $time->getAttribute('value');
-		// TO DO use comma to separate unless the 2nd last instance then use " and "
-		$s .= $value . ", ";
+        $s .= $time->getAttribute('value');
+        if ( $count == $maxCount - 1 ) {
+            $s .= " and ";
+        } elseif ( $count < $maxCount ) {
+            $s .= ", ";
+        }
+        $count += 1;
 	}
 	if ( $s > "" ) {
-		$s = "at " . rtrim($s, ", "); 
+		$s = "at " . $s;
 	}
 	return $s;	
 }
@@ -508,15 +527,21 @@ function generateDosageTimingEvent($dom) {
 	$nodes = $dom->getElementsByTagName('timing');
 	if ( $nodes->length > 0 ) {
 		$events = $nodes->item(0)->getElementsByTagName('event');
-		if ( $events->length > 0 ) {
-			$s .= "on ";
-			foreach ($events as $event) 
-			{
-				$value = $event->getAttribute('value');
-				$s .= $value . ", ";
-			}
-			$s = rtrim($s, ", ");
-		}
+        $count = 1;
+        $maxCount = (int)$events->length;
+        foreach ($events as $event)
+        {
+            $s .= $event->getAttribute('value');
+            if ( $count == $maxCount - 1 ) {
+                $s .= " and ";
+            } elseif ( $count < $maxCount ) {
+                $s .= ", ";
+            }
+            $count += 1;
+        }
+        if ( $s > "" ) {
+            $s = "on " . rtrim($s, ", ");
+        }
 	}
 	return $s;
 }
@@ -581,7 +606,7 @@ function generateDosagemaxDosePer($dom) {
 		if ( $denValue == "1" ) {
 			$s .= " per " . " " . $denUnit;
 		} else {
-			$s .= " over " . $denValue . " " . $denUnit;
+			$s .= " in " . $denValue . " " . $denUnit;
 		}
 		if ( $denValue > 1 ) {
 			$s .= "s";
@@ -611,6 +636,8 @@ function generateDosagemaxDosePer($dom) {
 function generateDosageAdditionalInstructions($dom) {
 	$s = "";
 	$instructions = $dom->getElementsByTagName('additionalInstruction');
+    $count = 1;
+    $maxCount = (int)$instructions->length;
 	foreach ($instructions as $instruction) 
 	{
 		$nodes = $instruction->getElementsByTagName('text');
@@ -621,9 +648,13 @@ function generateDosageAdditionalInstructions($dom) {
 		if ( $nodes->length > 0 ) {
 			$s .= $nodes->item(0)->getAttribute('value');
 		}
-		$s .= ", ";
+        if ( $count == $maxCount - 1 ) {
+            $s .= " and ";
+        } elseif ( $count < $maxCount ) {
+            $s .= ", ";
+        }
+        $count += 1;
 	}
-	$s = rtrim($s, ", ");
 	return $s;
 }
 
@@ -721,88 +752,110 @@ function createInstructionString($arr) {
 	if ( $arr["patientInstruction"] > "" ) { $s .= $arr["patientInstruction"] . SEPARATOR ; }
 	return rtrim($s, SEPARATOR);
 }
-
-function createCUIDosageString($arr, $option) {
+    
+function createCUIDosageString($xxx, $option) {
 	$s = "";
 	$part = "";
 	$sep = SEPARATOR;
 	
-	if ( $option == "html" ) {
-		$sep = "<br/>";
-	}
-	// method
-	if ( $arr["method"] > "" ) { 
-		if ( $s > "" ) { $s .= $sep; }
-		if ( $option == "html" ) {
-            $s .= "<span style='font-family:courier; font-size:smaller; font-weight:bold; color:blue;'>METHOD </span>";
-		}
-		$s .= $arr["method"]; 
-	}
-	
-	// dose
-	if ( $arr["doseQuantity"] > "" || $arr["doseRange"] > "" || $arr["rateRatio"] > "" || $arr["rateRange"] > "" || $arr["rateQuantity"] > "" || $arr["duration"] > ""  ) 
-	{
-		if ( $s > "" ) { $s .= $sep; }
-		$s .= "<span style='font-family:courier; font-size:smaller;font-weight:bold;color:blue;'>DOSE </span>";
-		$part = "";
-		if ( $arr["doseQuantity"] > "" ) { $part .= $arr["doseQuantity"] . SEPARATOR ; }
-		if ( $arr["doseRange"] > "" ) { $part .= $arr["doseRange"] . SEPARATOR ; }
-		if ( $arr["rateRatio"] > "" ) { $part .= $arr["rateRatio"] . SEPARATOR ; }
-		if ( $arr["rateRange"] > "" ) { $part .= $arr["rateRange"] . SEPARATOR ; }
-		if ( $arr["rateQuantity"] > "" ) { $part .= $arr["rateQuantity"] . SEPARATOR ; }
-		if ( $arr["duration"] > "" ) { $parts .= $arr["duration"] . SEPARATOR ; }
-		$s .= rtrim($part, SEPARATOR);
-	}
-	
-	// route
-	if ( $arr["route"] > "" ) { 
-		if ( $s > "" ) { $s .= $sep; }
-		if ( $option == "html" ) {
-			$s .= "<span style='font-family:courier; font-size:smaller;font-weight:bold;color:blue;'>ROUTE </span>";
-		} 
-		$s .= $arr["route"] ; 
-	}
-	
-	//site
-	if ( $arr["site"] > "" ) { 
-		if ( $s > "" ) { $s .= $sep; }
-		if ( $option == "html" ) {
-			$s .= "<span style='font-family:courier; font-size:smaller;font-weight:bold;color:blue;'>SITE </span>";
-		}
-		$s .= $arr["site"] ; 
-	}
-	
-	// timing
-	if ( $arr["timingWhen"] > "" || $arr["timingDayOfWeek"] > "" || $arr["timingTimeOfDay"] > "" || $arr["timingFrequency"] > "" || $arr["asNeeded"] > "" || $arr["timingBounds"] > "" || $arr["timingCount"] > "" || $arr["timingEvent"] > "" ) 
-	{
-		if ( $s > "" ) { $s .= $sep; }
-		if ( $option == "html" ) {
-			$s .= "<span style='font-family:courier; font-size:smaller;font-weight:bold;color:blue;'>TIMING </span>";
-		}
-		$part = "";
-        if ( $arr["timingFrequency"] > "" ) { $part .= $arr["timingFrequency"] . SEPARATOR ; }
-		if ( $arr["timingWhen"] > "" ) { $part .= $arr["timingWhen"] . SEPARATOR ; }
-		if ( $arr["timingDayOfWeek"] > "" && $arr["timingTimeOfDay"] > "" ) {
-			$part .= $arr["timingDayOfWeek"] . " " . $arr["timingTimeOfDay"] . SEPARATOR ;
-		}
-		else {
-			if ( $arr["timingDayOfWeek"] > "" ) { $part .= $arr["timingDayOfWeek"] . SEPARATOR ; }
-			if ( $arr["timingTimeOfDay"] > "" ) { $part .= $arr["timingTimeOfDay"] . SEPARATOR ; }
-		}
-		if ( $arr["asNeeded"] > "" ) { $part .= $arr["asNeeded"] . SEPARATOR ; }
-		if ( $arr["timingBounds"] > "" ) { $part .= $arr["timingBounds"] . SEPARATOR ; }
-		if ( $arr["timingCount"] > "" ) { $part .= $arr["timingCount"] . SEPARATOR ; }
-		if ( $arr["timingEvent"] > "" ) { $part .= $arr["timingEvent"] . SEPARATOR ; }
-		$s .= rtrim($part, SEPARATOR);
-	}
-	
-	// additional stuff
-	$part = "";
-	if ( $s > "" ) { $part = $sep; }
-	if ( $arr["maxDosePer"] > "" ) { $part .= $arr["maxDosePer"] . SEPARATOR ; }
-	if ( $arr["additionalInstruction"] > "" ) { $part .= $arr["additionalInstruction"] . SEPARATOR ; }
-	if ( $arr["patientInstruction"] > "" ) { $part .= $arr["patientInstruction"] . SEPARATOR ; }
-	$s .= rtrim($part, SEPARATOR);
+    if ( $option == "html" ) {
+        $sep = "<br/>";
+    }
+    
+    $count = 1;
+    $maxCount = sizeof($xxx);
+    
+    foreach ($xxx as $arr) {
+
+        if ( $arr["sequenceType"] == "SEQUENTIAL" ) {
+            $clauseSep = $sep . "Followed by";
+        } elseif ( $arr["sequenceType"] == "CONCURRENT" ) {
+            $clauseSep = $sep . "And";
+        } else {
+            $clauseSep = "X";
+        }
+
+        if ( $count <= $maxCount && $count != 1 ) {
+            $s .= "<span style='font-family:courier; font-size:smaller;font-weight:bold;color:black;'>" . $clauseSep . " </span>";
+        }
+        $count += 1;
+        
+        // method
+        if ( $arr["method"] > "" ) {
+            if ( $s > "" ) { $s .= $sep; }
+            if ( $option == "html" ) {
+                $s .= "<span style='font-family:courier; font-size:smaller; font-weight:bold; color:blue;'>METHOD </span>";
+            }
+            $s .= $arr["method"];
+        }
+        
+        // dose
+        if ( $arr["doseQuantity"] > "" || $arr["doseRange"] > "" || $arr["rateRatio"] > "" || $arr["rateRange"] > "" || $arr["rateQuantity"] > "" || $arr["duration"] > ""  )
+        {
+            if ( $s > "" ) { $s .= $sep; }
+            $s .= "<span style='font-family:courier; font-size:smaller;font-weight:bold;color:blue;'>DOSE </span>";
+            $part = "";
+            if ( $arr["doseQuantity"] > "" ) { $part .= $arr["doseQuantity"] . SEPARATOR ; }
+            if ( $arr["doseRange"] > "" ) { $part .= $arr["doseRange"] . SEPARATOR ; }
+            if ( $arr["rateRatio"] > "" ) { $part .= $arr["rateRatio"] . SEPARATOR ; }
+            if ( $arr["rateRange"] > "" ) { $part .= $arr["rateRange"] . SEPARATOR ; }
+            if ( $arr["rateQuantity"] > "" ) { $part .= $arr["rateQuantity"] . SEPARATOR ; }
+            if ( $arr["duration"] > "" ) { $parts .= $arr["duration"] . SEPARATOR ; }
+            $s .= rtrim($part, SEPARATOR);
+        }
+        
+        // route
+        if ( $arr["route"] > "" ) {
+            if ( $s > "" ) { $s .= $sep; }
+            if ( $option == "html" ) {
+                $s .= "<span style='font-family:courier; font-size:smaller;font-weight:bold;color:blue;'>ROUTE </span>";
+            }
+            $s .= $arr["route"] ;
+        }
+        
+        //site
+        if ( $arr["site"] > "" ) {
+            if ( $s > "" ) { $s .= $sep; }
+            if ( $option == "html" ) {
+                $s .= "<span style='font-family:courier; font-size:smaller;font-weight:bold;color:blue;'>SITE </span>";
+            }
+            $s .= $arr["site"] ;
+        }
+        
+        // timing
+        if ( $arr["timingWhen"] > "" || $arr["timingDayOfWeek"] > "" || $arr["timingTimeOfDay"] > "" || $arr["timingFrequency"] > "" || $arr["asNeeded"] > "" || $arr["timingBounds"] > "" || $arr["timingCount"] > "" || $arr["timingEvent"] > "" )
+        {
+            if ( $s > "" ) { $s .= $sep; }
+            if ( $option == "html" ) {
+                $s .= "<span style='font-family:courier; font-size:smaller;font-weight:bold;color:blue;'>TIMING </span>";
+            }
+            $part = "";
+            if ( $arr["timingFrequency"] > "" ) { $part .= $arr["timingFrequency"] . SEPARATOR ; }
+            if ( $arr["timingWhen"] > "" ) { $part .= $arr["timingWhen"] . SEPARATOR ; }
+            if ( $arr["timingDayOfWeek"] > "" && $arr["timingTimeOfDay"] > "" ) {
+                $part .= $arr["timingDayOfWeek"] . " " . $arr["timingTimeOfDay"] . SEPARATOR ;
+            }
+            else {
+                if ( $arr["timingDayOfWeek"] > "" ) { $part .= $arr["timingDayOfWeek"] . SEPARATOR ; }
+                if ( $arr["timingTimeOfDay"] > "" ) { $part .= $arr["timingTimeOfDay"] . SEPARATOR ; }
+            }
+            if ( $arr["asNeeded"] > "" ) { $part .= $arr["asNeeded"] . SEPARATOR ; }
+            if ( $arr["timingBounds"] > "" ) { $part .= $arr["timingBounds"] . SEPARATOR ; }
+            if ( $arr["timingCount"] > "" ) { $part .= $arr["timingCount"] . SEPARATOR ; }
+            if ( $arr["timingEvent"] > "" ) { $part .= $arr["timingEvent"] . SEPARATOR ; }
+            $s .= rtrim($part, SEPARATOR);
+        }
+        
+        // additional stuff
+        $part = "";
+        if ( $arr["maxDosePer"] > "" ) { $part .= $arr["maxDosePer"] . SEPARATOR ; }
+        if ( $arr["additionalInstruction"] > "" ) { $part .= $arr["additionalInstruction"] . SEPARATOR ; }
+        if ( $arr["patientInstruction"] > "" ) { $part .= $arr["patientInstruction"] . SEPARATOR ; }
+        if ( $part > "" ) {
+            $s .= $sep . rtrim($part, SEPARATOR);
+        }
+        
+    }
 	return $s;
 }
 ?>
