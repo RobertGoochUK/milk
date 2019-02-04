@@ -1,6 +1,6 @@
 <?php
     
-    include("functions.php");
+    include_once("functions.php");
     
     $output = $_REQUEST['o'];
     if ( $output == "" ) {

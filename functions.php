@@ -1,90 +1,97 @@
 <?php
-
-define("SEPARATOR", " - ");
+// Alpha v1.0.7
+    define("SEPARATOR", " - ");
     
-function valuesetUnitsOfTime($value)
-{
-	if ( $value == "s" ) { return "second"; }
-	if ( $value == "min" ) { return "minute"; }
-	if ( $value == "h" ) { return "hour"; }
-	if ( $value == "d" ) { return "day"; }
-	if ( $value == "wk" ) { return "week"; }
-	if ( $value == "mo" ) { return "month"; }
-	if ( $value == "a" ) { return "year"; }
-	return $value;
-}
+    function formatDecimal($value) {
+        $tmp = number_format($value,6);
+        $tmp = rtrim($tmp, "0");
+        $tmp = rtrim($tmp, ".");
+        return $tmp;
+    }
+    
+    function valuesetUnitsOfTime($value)
+    {
+        if ( $value == "s" ) { return "second"; }
+        if ( $value == "min" ) { return "minute"; }
+        if ( $value == "h" ) { return "hour"; }
+        if ( $value == "d" ) { return "day"; }
+        if ( $value == "wk" ) { return "week"; }
+        if ( $value == "mo" ) { return "month"; }
+        if ( $value == "a" ) { return "year"; }
+        return $value;
+    }
 
-function valuesetDaysOfWeek($value)
-{
-	if ( $value == "mon" ) { return "Monday"; }
-	if ( $value == "tue" ) { return "Tuesday"; }
-	if ( $value == "wed" ) { return "Wednesday"; }
-	if ( $value == "thu" ) { return "Thursday"; }
-	if ( $value == "fri" ) { return "Friday"; }
-	if ( $value == "sat" ) { return "Saturday"; }
-	if ( $value == "sun" ) { return "Sunday"; }
-	return $value;
-}
+    function valuesetDaysOfWeek($value)
+    {
+        if ( $value == "mon" ) { return "Monday"; }
+        if ( $value == "tue" ) { return "Tuesday"; }
+        if ( $value == "wed" ) { return "Wednesday"; }
+        if ( $value == "thu" ) { return "Thursday"; }
+        if ( $value == "fri" ) { return "Friday"; }
+        if ( $value == "sat" ) { return "Saturday"; }
+        if ( $value == "sun" ) { return "Sunday"; }
+        return $value;
+    }
 
-function valuesetEventTiming($value)
-{
-	if ( $value == "MORN" ) { return "during the morning"; }
-	if ( $value == "AFT" ) { return "during the afternoon"; }
-	if ( $value == "EVE" ) { return "during the evening"; }
-	if ( $value == "NIGHT" ) { return "during the night"; }
-	if ( $value == "PHS" ) { return "after sleep"; }
-	if ( $value == "HS" ) { return "before sleep"; }
-	if ( $value == "WAKE" ) { return "after waking"; }
-	if ( $value == "C" ) { return "at a meal"; }
-	if ( $value == "CM" ) { return "at breakfast"; }
-	if ( $value == "CD" ) { return "at lunch"; }
-	if ( $value == "CV" ) { return "at dinner"; }
-	if ( $value == "AC" ) { return "before a meal"; }
-	if ( $value == "ACM" ) { return "before beakfast"; }
-	if ( $value == "ACD" ) { return "before lunch"; }
-	if ( $value == "ACV" ) { return "before dinner"; }
-	if ( $value == "PC" ) { return "after a meal"; }
-	if ( $value == "PCM" ) { return "after breakfast"; }
-	if ( $value == "PCD" ) { return "after lunch"; }
-	if ( $value == "PCV" ) { return "after dinner"; }	
-	return $value;
-}
+    function valuesetEventTiming($value)
+    {
+        if ( $value == "MORN" ) { return "during the morning"; }
+        if ( $value == "AFT" ) { return "during the afternoon"; }
+        if ( $value == "EVE" ) { return "during the evening"; }
+        if ( $value == "NIGHT" ) { return "during the night"; }
+        if ( $value == "PHS" ) { return "after sleep"; }
+        if ( $value == "HS" ) { return "before sleep"; }
+        if ( $value == "WAKE" ) { return "after waking"; }
+        if ( $value == "C" ) { return "at a meal"; }
+        if ( $value == "CM" ) { return "at breakfast"; }
+        if ( $value == "CD" ) { return "at lunch"; }
+        if ( $value == "CV" ) { return "at dinner"; }
+        if ( $value == "AC" ) { return "before a meal"; }
+        if ( $value == "ACM" ) { return "before beakfast"; }
+        if ( $value == "ACD" ) { return "before lunch"; }
+        if ( $value == "ACV" ) { return "before dinner"; }
+        if ( $value == "PC" ) { return "after a meal"; }
+        if ( $value == "PCM" ) { return "after breakfast"; }
+        if ( $value == "PCD" ) { return "after lunch"; }
+        if ( $value == "PCV" ) { return "after dinner"; }
+        return $value;
+    }
 
-function valueDaysHoursMinutes($m)
-{
-	$ret = "";
-	if ( $m % 1440 == 0 )
-	{
-		$value = (int) $m / 1440;
-		if ( $value == 1 ) {
-			$ret = $value . " day ";
-		}
-		else {
-			$ret = $value . " days ";
-		}
-	}
-	elseif ( $m % 60 == 0 )
-	{
-		$value = (int) $m / 60;
-		if ( $value == 1 ) {
-			$ret = $value . " hour ";
-		}
-		else {
-			$ret = $value . " hours ";
-		}		
-	}
-	else 
-	{
-		$value = $m;
-		if ( $m == 1 ) {
-			$ret = $value . " minute ";
-		}
-		else {
-			$ret = $value . " minutes ";
-		}		
-	}
-	return $ret;
-}
+    function valueDaysHoursMinutes($m)
+    {
+        $ret = "";
+        if ( $m % 1440 == 0 )
+        {
+            $value = (int) $m / 1440;
+            if ( $value == 1 ) {
+                $ret = $value . " day ";
+            }
+            else {
+                $ret = $value . " days ";
+            }
+        }
+        elseif ( $m % 60 == 0 )
+        {
+            $value = (int) $m / 60;
+            if ( $value == 1 ) {
+                $ret = $value . " hour ";
+            }
+            else {
+                $ret = $value . " hours ";
+            }
+        }
+        else
+        {
+            $value = $m;
+            if ( $m == 1 ) {
+                $ret = $value . " minute ";
+            }
+            else {
+                $ret = $value . " minutes ";
+            }
+        }
+        return $ret;
+    }
 
 function generateDosageMethod($dom) {
 	$s = "";
@@ -96,14 +103,14 @@ function generateDosageMethod($dom) {
 	}
 	return $s;
 }
-
+    
 function generateDosageDoseQuantity($dom) {
 	$s = "";
 	$doseQuantities = $dom->getElementsByTagName('doseQuantity');
 	if ( $doseQuantities->length > 0 ) {
 		$values	= $doseQuantities->item(0)->getElementsByTagName('value');
 		$value = $values->item(0)->getAttribute('value');
-		$s .= number_format($value);
+        $s .= formatDecimal($value);
 		$units = $doseQuantities->item(0)->getElementsByTagName('unit');
 		if ( $units->length > 0 ) {
 			$s .= " " . $units->item(0)->getAttribute('value');
@@ -120,12 +127,12 @@ function generateDosageDoseRange($dom) {
 		$lows = $doseRanges->item(0)->getElementsByTagName('low');
 		$values = $lows->item(0)->getElementsByTagName("value");
 		$value = $values->item(0)->getAttribute('value');
-		$s .= number_format($value);
+		$s .= formatDecimal($value);
 		$s .= " to ";
 		$highs = $doseRanges->item(0)->getElementsByTagName('high');
 		$values = $highs->item(0)->getElementsByTagName("value");
 		$value = $values->item(0)->getAttribute('value');
-		$s .= number_format($value);
+		$s .= formatDecimal($value);
 		$units = $highs->item(0)->getElementsByTagName("unit");
 		$s .= " ";
 		$s .= $units->item(0)->getAttribute('value');
@@ -142,7 +149,7 @@ function generateDosageRateRatio($dom) {
 		$numerators = $rateRatios->item(0)->getElementsByTagName('numerator');
 		$values = $numerators->item(0)->getElementsByTagName("value");
 		$value = $values->item(0)->getAttribute('value');
-		$s .= number_format($value);
+		$s .= formatDecimal($value);
 		$s .= " ";
 		$units = $numerators->item(0)->getElementsByTagName("code");
 		$s .= $units->item(0)->getAttribute('value');
@@ -152,7 +159,7 @@ function generateDosageRateRatio($dom) {
 		$unit = $units->item(0)->getAttribute('value');
 		$values = $denominators->item(0)->getElementsByTagName("value");
 		$value = $values->item(0)->getAttribute('value');
-		$value = number_format($value);
+		$value = formatDecimal($value);
 		if ( $value == "1" ) {
 			$s .= " per " . $unit;
 		} else {
@@ -171,13 +178,13 @@ function generateDosageRateRange($dom) {
 		$lows = $rateRanges->item(0)->getElementsByTagName('low');
 		$values = $lows->item(0)->getElementsByTagName("value");
 		$value = $values->item(0)->getAttribute('value');
-		$s .= number_format($value);
+		$s .= formatDecimal($value);
 		
 		$s .= " to ";
 		$highs = $rateRanges->item(0)->getElementsByTagName('high');
 		$values = $highs->item(0)->getElementsByTagName("value");
 		$value = $values->item(0)->getAttribute('value');
-		$s .= number_format($value);
+		$s .= formatDecimal($value);
 		
 		$units = $highs->item(0)->getElementsByTagName("code");
 		$s .= " ";
@@ -194,7 +201,7 @@ function generateDosageRateQuantity($dom) {
 		$s = "at a rate of ";
 		$values = $rateQuantities->item(0)->getElementsByTagName('value');
 		$value = $values->item(0)->getAttribute('value');
-		$s .= number_format($value);
+		$s .= formatDecimal($value);
 		
 		$s .= " ";
 		$values = $rateQuantities->item(0)->getElementsByTagName('code');
@@ -563,7 +570,7 @@ function generateDosagemaxDosePer($dom) {
 			$values = $numerators->item(0)->getElementsByTagName('value');
 			if ( $values->length > 0 ) {
 				$numValue = $values->item(0)->getAttribute('value');
-				$numValue = number_format($numValue);
+				$numValue = formatDecimal($numValue);
 			}
 			$values = $numerators->item(0)->getElementsByTagName('code');
 			if ( $values->length > 0 ) {
@@ -616,7 +623,7 @@ function generateDosagemaxDosePer($dom) {
 	if ( $nodes->length > 0 ) {
 		$values = $nodes->item(0)->getElementsByTagName('value');
 		$value = $values->item(0)->getAttribute('value');
-		$value = number_format($value);
+		$value = formatDecimal($value);
 		$values = $nodes->item(0)->getElementsByTagName('code');
 		$unit = $values->item(0)->getAttribute('value');			
 		$s .= "up to a maximum of " .	$value . " " . $unit . " per dose";
@@ -625,7 +632,7 @@ function generateDosagemaxDosePer($dom) {
 	if ( $nodes->length > 0 ) {
 		$values = $nodes->item(0)->getElementsByTagName('value');
 		$value = $values->item(0)->getAttribute('value');
-		$value = number_format($value);
+		$value = formatDecimal($value);
 		$values = $nodes->item(0)->getElementsByTagName('code');
 		$unit = $values->item(0)->getAttribute('value');			
 		$s .= "up to a maximum of " .	$value . " " . $unit . " over lifetime of patient";
