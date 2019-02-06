@@ -9,9 +9,16 @@
     <meta name="description" content="">
     <meta name="author" content="">
     <style>
-        .gray-small-button { background:lightgray;padding:10px; }
         .outputBox { border-style:solid; border-width:1px; padding:10px; font-family:courier; }
         .outputCUIBox { border-style:solid; border-width:1px; padding:10px; font-family:Helvetica; }
+        /* some CSS overrides for gist <script> and minicss incompatibility */
+        table:not(.horizontal) td { flex: 0; }
+        body .gist .gist-meta {
+            display: none;
+        }
+        body .gist tr:last-child td {
+            padding-bottom: 15px !important;
+        }
     </style>
   </head>
   
@@ -197,14 +204,17 @@ function showExample() {
     </div>
     <div class="row">
         <div class="col-sm">
-Returns an appropriate human readable dosage string generated from the given FHIR Dosage structure. Use to populate the .text structure within profiled resources like <a href="https://fhir.hl7.org.uk/STU3/StructureDefinition/CareConnect-MedicationRequest-1">CareConnect-MedicationRequest-1</a>.
+<p>Returns an appropriate human readable dosage string generated from the given FHIR Dosage structure.</p>
+<p>Use to populate the .text structure within profiled resources like <a href="https://fhir.hl7.org.uk/STU3/StructureDefinition/CareConnect-MedicationRequest-1">CareConnect-MedicationRequest-1</a> as per this example.</p>
 		</div>
-		<!--
-		<div class="col-sm">
-			<script src="https://gist.github.com/RobertGoochUK/95ecc87683173d4ceeb4d9119d8094bd.js"></script>
-		</div>
-		-->
+        <div class="col-sm">
+            <small><b>Example FHIR XML</b></small></br>
+            <script src="https://gist.github.com/RobertGoochUK/95ecc87683173d4ceeb4d9119d8094bd.js"></script>
+        </div>
 	</div>
+    <div class="row">
+        
+    </div>
 	<div class="row">
 		<div class="col-sm-2">     
 			<button class="primary small" type="button" onclick="callGetDosageTextForm('text','divOutputBox')">Plain Text</button>
@@ -297,16 +307,20 @@ Returns an appropriate human readable dosage string generated from the given FHI
     </div>
     <div class="row">
         <div class="col-sm">
-Return a complete <a href="https://fhir.hl7.org.uk/STU3/StructureDefinition/CareConnect-Medication-1">CareConnect-Medication-1</a> FHIR resource as either XML or JSON. This web service could be used to reference a medication resource within another resource.
+<p>Return a complete <a href="https://fhir.hl7.org.uk/STU3/StructureDefinition/CareConnect-Medication-1">CareConnect-Medication-1</a> FHIR resource as either XML or JSON.</p>
+<p>This web service could be used to reference a medication resource within another resource as per this example.</p>
+        </div>
+        <div class="col-sm">
+            <small><b>Example FHIR XML</b></small></br>
+            <script src="https://gist.github.com/RobertGoochUK/b225dd212fdf062a0a76c7ec6dc0bf0a.js"></script>
         </div>
     </div>
-    <!--<script src="https://gist.github.com/RobertGoochUK/b225dd212fdf062a0a76c7ec6dc0bf0a.js"></script>-->
     <div class="row">
         <div class="cols-sm-6">
 			<div class="input-group">
                 <button class="primary" type="button" onclick="callGetMedicationResource('divOutputResource')">Execute</button>
 				<label for="concept_id">dm+d concept (id):</label>
-				<input type="number" name="concept_id" id="concept_id" autocomplete="off" readonly="true" value="318902004"></input>
+				<input type="number" name="concept_id" id="concept_id" autocomplete="off"></input>
 				<label for="ot3">Output Type (ot):</label>
 				<input type="radio" id="ot3-json" name="ot3" value="json" checked>json</input>
 				<input type="radio" id="ot3-xml" name="ot3" value="xml">xml</input>				
