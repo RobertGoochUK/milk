@@ -1,5 +1,7 @@
 <?php
 
+    include_once("dbconfig.php");
+    
     // get the Request parameters
     $id = $_REQUEST['id'];
     $type = $_REQUEST['ot'];
@@ -9,44 +11,45 @@
     $form_cd = null;
     $form_desc = null;
     
-    // open the database connection
-    $dom = new DOMDocument;
-    if ( $dom->load("f_vmp2_3011118.xml") ) {
-        // valid
-        $x = new DOMXPath($dom);
-        $result = $x->evaluate("//text()[. = '" . $id . "']/parent::*");
-    } else {
-        // invalid
-        echo "Error loading dm+d XML";
+    $con = mysql_connect($host, $user, $password, true );
+    // Check connection
+    if (!$con) {
+        echo "FAIL";
+        die("Connection failed: " . mysql_error());
+        exit;
     }
     
-    // loop thru the XPath result nodes containing the requested concept id
-    foreach ($result as $item) {
-        // get the node parent
-        $parent = $item->parentNode;
-        // if the VMP general info
-        if ( $parent->nodeName == "VMP" ) {
-            $nodes = $parent->childNodes;
-            foreach ($nodes as $childNode) {
-                if ( $childNode->nodeName == "NM" ) {
-                    $nm = $childNode->nodeValue;
-                }
-            }
-        }
-        // if the VMP Form info
-        if ( $parent->nodeName == "DFORM" ) {
-            $nodes = $parent->childNodes;
-            foreach ($nodes as $childNode) {
-                if ( $childNode->nodeName == "FORMCD" ) {
-                    $form_cd = $childNode->nodeValue;
-                    $form_desc = "Capsule"; // need to write a function for the lookup xml file
-                }
-            }
-        }
+    /*
+    // open the database connection
+    $con = mysqli_connect($host, $user, $password, $dbname);
+    if (!$con) {
+        echo "Error: Unable to connect to MySQL." . PHP_EOL;
+        echo "Debugging errno: " . mysqli_connect_errno() . PHP_EOL;
+        echo "Debugging error: " . mysqli_connect_error() . PHP_EOL;
+        exit;
     }
+    */
+    
+    $db_selected = mysql_select_db($dbname, $con);
+    if (!$db_selected) {
+        die ('Can\'t use foo : ' . mysql_error());
+        exit;
+    }
+    $sql_query = "SELECT name FROM vtm WHERE vtmid = " . $id . " UNION SELECT name FROM vmp WHERE vmpid = " . $id . ";";
+    $result = mysql_query($sql_query);
+    if (!$result) {
+        die('Invalid query: ' . mysql_error());
+        exit;
+    }
+    while ($row = mysql_fetch_array($result, MYSQL_NUM))
+    {
+        $nm = $row[0];
+    }
+    mysql_close($con);
+    
     
 // get the data from dm+d from the database
-$resourceid = '<id value="careconnect-medication-1-' . $id . '/>';
+$resourceid = '<id value="careconnect-medication-1-' . $id . '"/>';
 $text = '<text><div>' . $nm . '</div></text>';
 $system = '<system value="http://snomed.info/sct"/>';
 $code = '<code><coding><display value="' . $nm . '"/><code value="' . $id . '"/></coding></code>';
@@ -54,19 +57,22 @@ $form = '<form><coding><system value="http://snomed.info/sct"/><code value="' . 
 //$ingredients = '<ingredient></ingredient>';
 
 // now build up the FHIR resource XML
-$s = '<?xml version="1.0" encoding="UTF-8"?><Medication>';
+$s = '<?xml version="1.0"?><Medication>';
 $s .= $resourceid;
 $s .= '<meta></meta>';
 $s .= $text;
 $s .= $code;
-$s .= $form;
+//$s .= $form;
 //$s .= $ingredient;
 $s .= '</Medication>';
 
-//echo $s;
-
 // return in the requested format
 $xml = new SimpleXMLElement($s);
+if ( !$xml ) {
+    echo "Error creating XML";
+    exit;
+}
+
 if ($type == "xml") {
     echo $xml->asXML();
 } else {
