@@ -1,5 +1,6 @@
 <?php
-// Alpha v1.0.7
+// Alpha v1.0.9
+    
     define("SEPARATOR", " - ");
     
     function formatDecimal($value) {
@@ -229,7 +230,7 @@ function generateDosageDuration($dom) {
 		}
 		
 		$s .= "over " . $duration . " " . $unit;
-		if ( $unit > "1" ) {
+		if ( $duration > "1" ) {
 			$s .= "s";
 		}
 		if ( $max > "" ) {
@@ -483,6 +484,8 @@ function generateDosageTimingBounds($dom) {
 	$boundsRange = $dom->getElementsByTagName('boundsRange');
 	if ( $boundsRange->length > 0 ) {
 		
+        if ( $s > "" ) { $s .= " "; };
+        
 		$nodes = $boundsRange->item(0)->getElementsByTagName('low');
 		$lowNode = $nodes->item(0)->getElementsByTagName('value');
 		$lowValue = $lowNode->item(0)->getAttribute('value');
@@ -497,6 +500,25 @@ function generateDosageTimingBounds($dom) {
 		
 		$s .= "for " . $lowValue . " to " . $highValue . " " . $highUnit . "s";
 	}
+
+    
+    $boundsRange = $dom->getElementsByTagName('boundsPeriod');
+    if ( $boundsRange->length > 0 ) {
+        if ( $s > "" ) { $s .= " "; };
+        $dateStart = "";
+        $dateEnd = "";
+        $nodes = $boundsRange->item(0)->getElementsByTagName('start');
+        if ( $nodes->length > 0 ) {
+            $dateStart = $nodes->item(0)->getAttribute('value');
+            $s .= "starting " . $dateStart;
+        }
+        $nodes = $boundsRange->item(0)->getElementsByTagName('end');
+        if ( $nodes->length > 0 ) {
+            $dateEnd = $nodes->item(0)->getAttribute('value');
+            $s .= " until " . $dateEnd;
+        }
+    }
+    
 	return $s;
 }
 
@@ -511,10 +533,10 @@ function generateDosageTimingCount($dom) {
 	$counts = $dom->getElementsByTagName('count');
 	if ( $counts->length > 0 ) {
 		$count = $counts->item(0)->getAttribute('value');
+        $s .= "take ";
 		if ( $count == "1" ) {
 			$s .= "once";
 		} else {
-			$s .= "repeat ";
 			if ( $count == "2" && $countMax == "" ) {
 				$s .= "twice ";
 			} else {
