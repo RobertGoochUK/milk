@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <link rel="stylesheet" href="https://cdn.rawgit.com/Chalarangelo/mini.css/v3.0.1/dist/mini-default.min.css">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Project MILK</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <style>
+        .outputBox { border-style:solid; border-width:1px; padding:10px; font-family:courier; }
+        .outputCUIBox { border-style:solid; border-width:1px; padding:10px; font-family:Helvetica; }
+        /* some CSS overrides for gist <script> and minicss incompatibility */
+        table:not(.horizontal) td { flex: 0; }
+        body .gist .gist-meta {
+            display: none;
+        }
+        body .gist tr:last-child td {
+            padding-bottom: 15px !important;
+        }
+    </style>
+  </head>
+  
+<script type='text/javascript'>
+
+function callGetMedicationResource(divName) {
+ 
+     var id = document.getElementById("concept_id").value;
+     
+     var outputType = "json";
+     if ( document.getElementById("ot3-xml").checked == true ) {
+         outputType = "xml";
+     }
+
+     var uri = "fhir/stu3/medicationResource.php?id=" + id + "&ot=" + outputType;
+     document.getElementById(divName).innerHTML = "Calling web services...";
+     var xmlhttp = new XMLHttpRequest();
+         xmlhttp.onreadystatechange = function() {
+             if (this.readyState == 4 && this.status == 200) {
+                 document.getElementById(divName).innerHTML = this.responseText;
+             } else {
+                 document.getElementById(divName).innerHTML += "\r readyState=" + this.readyState + " status=" + this.status;
+             }
+         };
+     xmlhttp.open("GET", uri, true);
+     xmlhttp.send();
+}
+</script>
+
+<body>
+    
+    <header class="sticky" style="background:#005EB8;">
+        <a href="index.html" class="logo" style="color:white;">MILK</a>
+        <a href="dosage.html" class="button">FHIR Dosage-to-Text</a>
+        <a href="dosetranslation.html" class="button">Dose-to-Product Translation</a>
+        <a href="termserver.html" class="button"><img src="img/DMD_logo.png" style="width:60px;position: relative;top:4px;"/> Terminology Server</a>
+    </header>
+
+
+<div class="container">
+    <div class="row">
+        <div class="col-sm-12">
+            <p><mark class="secondary">Web services for demonstration or experimental use only. Subject to change without notice.</mark></p>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm">
+            <h2>dm+d Terminology Server</h2>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm">
+            <h3>Web Service: medicationResource <span class="icon-info"></span></h3>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm">
+<p>Return a complete <a href="https://fhir.hl7.org.uk/STU3/StructureDefinition/CareConnect-Medication-1">CareConnect-Medication-1</a> FHIR resource as either XML or JSON.</p>
+<p>This web service could be used to reference a medication resource within another resource as per this example.</p>
+<p>Logic implemented by this web service:</p>
+<li><mark class="tertiary">YES</mark> VTM, VMP and AMP concepts</li>
+<li><mark class="secondary">Not Yet</mark> VMPP and AMPP concepts</li>
+        </div>
+        <div class="col-sm">
+            <small><b>Example FHIR XML</b></small></br>
+            <script src="https://gist.github.com/RobertGoochUK/b225dd212fdf062a0a76c7ec6dc0bf0a.js"></script>
+        </div>
+    </div>
+    <div class="row">
+        <div class="cols-sm">
+			<div class="input-group vertical">
+				<label for="exampleConceptsList">Examples:</label>
+                <select name="exampleConceptsList" id="exampleConceptsList" onChange='document.getElementById("concept_id").value = this.value;'>
+                    <option value="">(clear)</option>
+                    <option value="25673006">[VTM] Omeprazole</option>
+                    <option value="317297007">[VMP] Omeprazole 10mg gastro-resistant capsules</option>
+                    <option value="24351311000001108">[VMP] Omeprazole 10mg/5ml oral solution</option>
+                    <option value="64411000001103">[AMP] Losec 10mg gastro-resistant capsules (AstraZeneca UK Ltd)</option>
+                </select>
+                <div class="input-group">
+                    <label for="concept_id">Concept id:</label>
+                    <span class="tooltip" aria-label="Enter a dm+d concept identifier here"><input type="number" name="concept_id" id="concept_id" autocomplete="off"></input></span>
+                    <button class="primary large" type="button" onclick="callGetMedicationResource('divOutputResource')">Execute</button>
+                </div>
+				<div class="input-group">
+                    <label for="ot3">Output Type (ot):</label>
+                    <input type="radio" id="ot3-xml" name="ot3" value="xml" checked>xml (default)</input>
+                    <input type="radio" id="ot3-json" name="ot3" value="json">json</input>
+                </div>
+                <pre>{base_url}/fhir/stu3/medicationResource.php?id={concept_id}&ot={output_type}<br/>&nbsp;&nbsp;&nbsp;will in time be changed to...<br/>&nbsp;&nbsp;&nbsp;{base_url}/fhir/stu3/Medication?code={concept_id}&amp;ot={output_type}</pre>
+			</div>
+		</div>
+        <div class="cols-sm">
+            <div class="input-group">
+                
+            </div>
+        </div>
+	</div>
+    <div class="row">
+		<p><b>Raw Output</b> (from web service):</p>
+		<textarea style="font-size:smaller;width:100%;" rows="4" name="divOutputResource" id="divOutputResource"></textarea>
+	</div>
+</div>
+
+
+<footer class="sticky">
+MILK Experimental Web Services - <mark class="secondary">Alpha v1.1.0</mark> - Source code on <a href="https://github.com/RobertGoochUK/milk">GitHub</a> - Join the <a href="https://interopen.ryver.com/index.html#forums/1276343">INTEROPen discussion</a>
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <link rel="stylesheet" href="https://cdn.rawgit.com/Chalarangelo/mini.css/v3.0.1/dist/mini-default.min.css">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Project MILK</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <style>
+        .outputBox { border-style:solid; border-width:1px; padding:10px; font-family:courier; }
+        .outputCUIBox { border-style:solid; border-width:1px; padding:10px; font-family:Helvetica; }
+        /* some CSS overrides for gist <script> and minicss incompatibility */
+        body .gist td { flex: 0; }
+        body .gist .gist-meta { display: none; }
+        body .gist tr:last-child td { padding-bottom: 15px !important; }
+    </style>
+  </head>
+  
+<script type='text/javascript'>
+
+function removeOptions(selectbox) {
+    var i;
+    for(i = selectbox.options.length - 1 ; i >= 0 ; i--) {
+        selectbox.remove(i);
+    }
+}
+
+function customDesc(rank) {
+    switch(parseInt(rank)) {
+        case 2:
+            var ret = "<mark class='tag'>Multiple product doses with product division</mark>";
+            break;
+        case 3:
+            var ret = "<mark class='tag'>Single product dose requires division</mark>";
+            break;
+        case 4:
+            var ret = "<mark class='tag secondary'>Dose form typically not divisable</mark>";
+            break;
+        default:
+            var ret = "<mark class='tag tertiary'>Product division not required</mark>";
+    }
+    return ret;
+}
+
+function CreateProductsList(myData) {
+    var oList = [];
+    try {
+        // load the JSON into an object
+        var json = myData,
+        obj = JSON.parse(json);
+        
+        var code = "";
+        var name = "";
+        var rank = "";
+        var qty = "";
+        var uom = "";
+        var divide = "";
+        var pres_stat = "";
+        
+        // loop thru the object and populate list
+        try {
+            if ( obj.products.vmp.length == undefined ) {
+                try {
+                    code = obj.products.vmp['id'].toString();
+                    name = obj.products.vmp['description'].toString();
+                    qty = obj.products.vmp['qty'].toString();
+                    rank = obj.products.vmp['rank'].toString();
+                    uom = obj.products.vmp['uom'].toString();
+                    pres_stat = obj.products.vmp['pres_stat'].toString();
+                    divide = customDesc(rank);
+                    oList.push({"rank": rank, "name": name, "id": code, "qty": qty, "uom": uom, "divisibility": divide, "pres_stat": pres_stat});
+                } catch (e1) {
+                    oList.push({"rank": 0, "name": "ERROR: " + e1 });
+                }
+            } else {
+                var l = obj.products.vmp.length;
+                for (var i = 0; i < l; i++) {
+                    try {
+                        var oProduct = obj.products.vmp[i];
+                        code = oProduct["id"].toString();
+                        name = oProduct["description"].toString();
+                        qty = oProduct["qty"].toString();
+                        rank = oProduct["rank"].toString();
+                        uom = oProduct["uom"].toString();
+                        pres_stat = oProduct["pres_stat"].toString();
+                        divide = customDesc(rank);
+                        oList.push({"rank": rank, "name": name, "id": code, "qty": qty, "uom": uom, "divisibility": divide, "pres_stat": pres_stat});
+                    } catch (e1) {
+                        oList.push({"rank": 0, "name": "ERROR: " + e1 });
+                    }
+                }
+            }
+        } catch (eee) {
+            oList.push({"rank": 0, "name": "ERROR: " + eee });
+        }
+    } catch (e) {
+        try {
+            // lets assume it's XML output
+            var parser = new DOMParser();
+            var xmlDoc = parser.parseFromString(myData,"text/xml");
+            var x = xmlDoc.getElementsByTagName("vmp");
+            for (i = 0; i < x.length ;i++) {
+                var code = "";
+                var name = "";
+                var rank = "";
+                var uom = "";
+                var qty = "";
+                var divide = "";
+                var pres_stat = "";
+                try { code = x[i].childNodes[0].childNodes[0].nodeValue; } catch (e1) {}
+                try { name = x[i].childNodes[1].childNodes[0].nodeValue; } catch (e1) {}
+                try { qty = x[i].childNodes[2].childNodes[0].nodeValue; } catch (e1) {}
+                try { uom = x[i].childNodes[3].childNodes[0].nodeValue; } catch (e1) {}
+                try { pres_stat = x[i].childNodes[4].childNodes[0].nodeValue; } catch (e1) {}
+                try { rank = x[i].childNodes[5].childNodes[0].nodeValue; } catch (e1) {}
+                divide = customDesc(rank);
+                oList.push({"rank": rank, "name": name, "id": code, "qty": qty, "uom": uom, "divisibility": divide, "pres_stat": pres_stat});
+            }
+        } catch (ee) {
+            oList.push({"rank": 0, "name": "ERROR: " + ee });
+        }
+    }
+    return oList;
+}
+
+function RenderProductsList(oList) {
+    var myElement = document.getElementById("divOutputProductsTable");
+    var s = "<table class='striped'><thead><tr><th>Product (VMP)</th><th>Quantity Required</th></tr></thead><tbody>";
+    oList.forEach(element => {
+                  var tmp = "";
+                  var flag = "";
+                  if ( element.pres_stat != "1" ) {
+                      switch(element.pres_stat) {
+                        case "2": tmp = "Invalid to prescribe in NHS primary care"; break;
+                        case "3": tmp = "Not prescribable as a VMP but AMP prescribable"; break;
+                        case "4": tmp = "Never valid to prescribe as a VMP"; break;
+                        case "5": tmp = "Not recommended To prescribe as a VMP"; break;
+                        case "6": tmp = "VMP not recommended to prescribe - brands not bioequivalent"; break;
+                        case "7": tmp = "VMP not recommended to prescribe - patient training required"; break;
+                        case "8": tmp = "VMP not recommended to prescribe - no published specification"; break;
+                      }
+                    flag = "<mark class='tag tertiary'>" + tmp + "</mark>";
+                  }
+                  s += "<tr><td data-label='Product'>" + element.name + "<br/><small>[code:" + element.id + "] " + flag + "</small></td>";
+                  s += "<td data-label='Required Quantity'>" + element.qty + " " + element.uom + "<br/><small>" + element.divisibility + "</small></td></tr>";
+    });
+    s += "</tbody></table>";
+    myElement.innerHTML = s;
+}
+
+function callGetProductsForm(divName) {
+    
+    var outputType = "json";
+    if ( document.getElementById("ot-xml").checked == true ) {
+        outputType = "xml";
+    }
+    
+    document.getElementById(divName).innerHTML = "Calling web services...";
+    
+    var args = "";
+    var myElement;
+    
+    myElement = document.getElementById("vtmlist");
+    if ( myElement.value != "" || myElement.value != "0" ) {
+        args += "&code=" + myElement.value;
+    }
+    myElement = document.getElementById("strength-val");
+    if ( myElement.value != "" ) {
+        args += "&s=" + myElement.value;
+    }
+    myElement = document.getElementById("uom_list");
+    if ( myElement.value != "" && myElement.value != "0" ) {
+        args += "&uom=" + myElement.value;
+    }
+    myElement = document.getElementById("form_list");
+    if ( myElement.value != "" && myElement.value != "0" ) {
+        args += "&form=" + myElement.value;
+    }
+    myElement = document.getElementById("route_list");
+    if ( myElement.value != "" && myElement.value != "0" ) {
+        args += "&route=" + myElement.value;
+    }
+    var uri = "getProducts.php?ot=" + outputType + args;
+    var dump = document.getElementById("testdiv");
+    dump.innerHTML = uri;
+    
+    var xmlhttp = new XMLHttpRequest();
+    xmlhttp.onreadystatechange = function() {
+       if (this.readyState == 4 && this.status == 200) {
+           document.getElementById(divName).innerHTML = this.responseText;
+           var oList = CreateProductsList(this.responseText);
+           RenderProductsList(oList);
+       } else {
+           document.getElementById(divName).innerHTML += "\r readyState=" + this.readyState + " status=" + this.status;
+       }
+    };
+    xmlhttp.open("GET", uri, true);
+    xmlhttp.send();
+}
+
+function callGetVTMList(target_id, search) {
+    
+    if ( search.length > 2 ) {
+        var list = document.getElementById(target_id);
+        var uri = "api/getvtmlist.php?s=" + search;
+        var xmlhttp = new XMLHttpRequest();
+        xmlhttp.onreadystatechange = function() {
+            if (this.readyState == 4 && this.status == 200) {
+                var json = this.responseText;
+                obj = JSON.parse(json);
+                removeOptions(list);
+                for (var x in obj.VTM)
+                {
+                    var child = obj.VTM[x];
+                    var option = document.createElement("option");
+                    option.value = child.ID;
+                    option.text = child.NM;
+                    list.appendChild(option);
+                }
+            }
+        };
+        xmlhttp.open("GET", uri, true);
+        xmlhttp.send();
+    }
+}
+
+function test1(vtm_id, list_id) {
+    var list = document.getElementById(list_id);
+    removeOptions(list);
+    var uri = "api/getformlist.php?id=" + vtm_id;
+    var xmlhttp = new XMLHttpRequest();
+    xmlhttp.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+            var json = this.responseText;
+            var obj = JSON.parse(json);
+            if ( obj.FORM.length == undefined )
+            {
+                var option = document.createElement("option");
+                option.value = obj.FORM['ID'].toString();
+                option.text = obj.FORM['NM'].toString();
+                list.appendChild(option);
+            } else {
+                for (var x in obj.FORM)
+                {
+                    var child = obj.FORM[x];
+                    var option = document.createElement("option");
+                    option.value = child.ID;
+                    option.text = child.NM;
+                    list.appendChild(option);
+                }
+            }
+        }
+    };
+    xmlhttp.open("GET", uri, true);
+    xmlhttp.send();
+}
+
+function test2(vtm_id, list_id) {
+    var list = document.getElementById(list_id);
+    removeOptions(list);
+    var uri2 = "api/getroutelist.php?id=" + vtm_id;
+    var xmlhttp2 = new XMLHttpRequest();
+    xmlhttp2.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+            var json = this.responseText;
+            var obj = JSON.parse(json);
+            if ( obj.ROUTE.length == undefined )
+            {
+                var option = document.createElement("option");
+                option.value = obj.ROUTE['ID'].toString();
+                option.text = obj.ROUTE['NM'].toString();
+                list.appendChild(option);
+            } else {
+                for (var x in obj.ROUTE)
+                {
+                    var child = obj.ROUTE[x];
+                    var option = document.createElement("option");
+                    option.value = child.ID;
+                    option.text = child.NM;
+                    list.appendChild(option);
+                }
+            }
+        }
+    };
+    xmlhttp2.open("GET", uri2, true);
+    xmlhttp2.send();
+}
+
+function test3(vtm_id, list_id) {
+    var list = document.getElementById(list_id);
+    removeOptions(list);
+    var uri2 = "api/getuomlist.php?id=" + vtm_id;
+    var xmlhttp2 = new XMLHttpRequest();
+    xmlhttp2.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+            var json = this.responseText;
+            var obj = JSON.parse(json);
+            if ( obj.UOM.length == undefined )
+            {
+                var option = document.createElement("option");
+                option.value = obj.UOM['ID'].toString();
+                option.text = obj.UOM['NM'].toString();
+                list.appendChild(option);
+            } else {
+                for (var x in obj.UOM)
+                {
+                    var child = obj.UOM[x];
+                    var option = document.createElement("option");
+                    option.value = child.ID;
+                    option.text = child.NM;
+                    list.appendChild(option);
+                }
+            }
+        }
+    };
+    xmlhttp2.open("GET", uri2, true);
+    xmlhttp2.send();
+}
+
+function getFormRouteList(vtm_id,list_form,list_route,list_uom) {
+    if ( vtm_id > "" ) {
+        test1(vtm_id,list_form);
+        test2(vtm_id,list_route);
+        test3(vtm_id,list_uom);
+        
+        var listForm = document.getElementById(list_form);
+        var option = document.createElement("option");
+        option.value = "0";
+        option.text = "(none)";
+        listForm.appendChild(option);
+        
+        var listRoute = document.getElementById(list_route);
+        var option = document.createElement("option");
+        option.value = "0";
+        option.text = "(none)";
+        listRoute.appendChild(option);
+        
+        var listUOM = document.getElementById(list_uom);
+        var option = document.createElement("option");
+        option.value = "0";
+        option.text = "(none)";
+        listUOM.appendChild(option);
+    }
+}
+</script>
+
+<body>
+    
+    <header class="sticky" style="background:#005EB8;">
+        <a href="index.html" class="logo" style="color:white;">MILK</a>
+        <a href="dosage.html" class="button">FHIR Dosage-to-Text</a>
+        <a href="dosetranslation.html" class="button">Dose-to-Product Translation</a>
+        <a href="termserver.html" class="button"><img src="img/DMD_logo.png" style="width:60px;position: relative;top:4px;"/> Terminology Server</a>
+    </header>
+
+<div class="container">
+    <div class="row">
+        <div class="col-sm-12">
+            <p><mark class="secondary">Web services for demonstration or experimental use only. Subject to change without notice.</mark></p>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm">
+            <h2>Dose-to-Product Translation</h2>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm">
+            <p>Return a list of VMP concepts that could fulfil the given dose-based instruction. The returned list is sorted by least product divisiblity, i.e. least quantity of the product to meet the ordered dose strength. Any additional filtering subject to local requirements, e.g. stock availability, formulary etc. It is not intended that this process auto-selects a single product. A human will ultimately decide on which product to use to fulfil the clinical need.</p>
+        </div>
+    </div>
+    <div class="row">
+        <div class="cols-sm-6">
+            <div class="input-group vertical">
+                <div class="input-group">
+                    <label for="vtmsearch">VTM Name Search:</label>
+                    <span class="tooltip" aria-label="Enter at least the first 3 characters of a VTM name">
+                        <input type="text" name="vtmsearch" id="vtmsearch" onchange="callGetVTMList('vtmlist',this.value)"></input>
+                    </span>
+                </div>
+                <div class="input-group">
+                    <label for="vtmlist">VTM:</label>
+                    <select name="vtmlist" id="vtmlist" onchange="getFormRouteList(this.value,'form_list','route_list', 'uom_list')"></select>
+                </div>
+                <div class="input-group">
+                    <label for="strength-val">Dose Strength:</label>
+                    <span class="tooltip" aria-label="A numerical value, e.g. '250' or '12.5'">
+                        <input type="text" name="strength-val" id="strength-val"></input>
+                    </span>
+                    <label for="uom_list">Dose Unit of Measure:</label>
+                    <select name="uom_list" id="uom_list"></select>
+                </div>
+                <div class="input-group">
+                    <label for="route_id">Route:</label>
+                    <select name="route_list" id="route_list"></select>
+                    <label for="form_id">Form:</label>
+                    <select name="form_list" id="form_list"></select>
+                    
+                </div>
+                <div class="input-group">
+                    <label for="ot">Output Type:</label>
+                    <input type="radio" id="ot-json" name="ot" value="json" checked>json</input>
+                    <input type="radio" id="ot-xml" name="ot" value="xml">xml</input>
+                </div>
+                <div class="input-group">
+                    <button class="tertiary" type="button" onclick="callGetProductsForm('divOutputProducts')">Execute</button>
+                </div>
+			</div>
+		</div>
+		
+	</div>
+    <div class="collapse">
+        <input type="checkbox" id="collapse-section1" aria-hidden="true">
+        <label for="collapse-section1" aria-hidden="true">Developer Information (click to hide/show)</label>
+        <div>
+            <div class="row">
+                <div class="cols-sm">
+                    <pre>{base_url}/getProducts.php?ot={output_type}&amp;code={vtm_id}&amp;s={dose_strength}&amp;uom={dose_uom}&amp;route={route_id}&amp;form={form_id}</pre>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm">
+                <b>Web Service Call</b>:
+                <textarea style="font-size:smaller;width:100%;" rows="2" name="testdiv" id="testdiv"></textarea>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm">
+                    <b>Web Service Raw Output</b>:
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm">
+                    <textarea style="font-size:smaller;width:100%;" rows="5" name="divOutputProducts" id="divOutputProducts"></textarea>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm">
+            <b>Rendered Web Service Output</b> (a list of VMP's which can be further filterd by the calling clinical system):
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm" id="divOutputProductsTable"></div>
+    </div>
+</div>
+
+<footer class="sticky">
+MILK Experimental Web Services - <mark class="secondary">Alpha v1.1.00</mark> - Source code on <a href="https://github.com/RobertGoochUK/milk">GitHub</a> - Join the <a href="https://interopen.ryver.com/index.html#forums/1276343">INTEROPen discussion</a>
+</footer>
+
+</body>
+</html>

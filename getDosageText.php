@@ -1,6 +1,7 @@
 <?php
     
-    include_once("functions.php");
+    include_once("api/dosage_functions.php");
+    include_once("api/common_functions.php");
     
     $output = $_REQUEST['o'];
     if ( $output == "" ) {

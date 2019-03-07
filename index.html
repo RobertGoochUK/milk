@@ -8,388 +8,128 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="">
     <meta name="author" content="">
-    <style>
-        .outputBox { border-style:solid; border-width:1px; padding:10px; font-family:courier; }
-        .outputCUIBox { border-style:solid; border-width:1px; padding:10px; font-family:Helvetica; }
-        /* some CSS overrides for gist <script> and minicss incompatibility */
-        table:not(.horizontal) td { flex: 0; }
-        body .gist .gist-meta {
-            display: none;
-        }
-        body .gist tr:last-child td {
-            padding-bottom: 15px !important;
-        }
-    </style>
   </head>
-  
-<script type='text/javascript'>
-
-function callGetConceptForm(divName) {
-
-    var id = document.getElementById("listConcepts").value;
-    
-    var outputType = "json";
-    if ( document.getElementById("ot2-xml").checked == true ) {
-        outputType = "xml";
-    }
-    
-    var outputFormat = "complete";
-    if ( document.getElementById("of-summary").checked == true ) {
-        outputFormat = "summary";
-    } else {
-        if ( document.getElementById("of-careconnect-medication-1").checked == true ) {
-            outputFormat = "careconnect-medication-1";
-        }
-    }
-    
-    var uri = "getConcept.php?id=" + id + "&ot=" + outputType + "&of=" + outputFormat;
-    var xmlhttp = new XMLHttpRequest();
-    xmlhttp.onreadystatechange = function() {
-        if (this.readyState == 4 && this.status == 200) {
-            document.getElementById(divName).innerHTML = this.responseText;
-        }
-    };
-    xmlhttp.open("GET", uri, true);
-    xmlhttp.send();
-}
-
-function callGetMedicationResource(divName) {
- 
-     var id = document.getElementById("concept_id").value;
-     
-     var outputType = "json";
-     if ( document.getElementById("ot3-xml").checked == true ) {
-         outputType = "xml";
-     }
-
-     var uri = "fhir/stu3/medicationResource.php?id=" + id + "&ot=" + outputType;
-     document.getElementById(divName).innerHTML = "Calling web services...";
-     var xmlhttp = new XMLHttpRequest();
-         xmlhttp.onreadystatechange = function() {
-             if (this.readyState == 4 && this.status == 200) {
-                 document.getElementById(divName).innerHTML = this.responseText;
-             } else {
-                 document.getElementById(divName).innerHTML += "\r readyState=" + this.readyState + " status=" + this.status;
-             }
-         };
-     xmlhttp.open("GET", uri, true);
-     xmlhttp.send();
- }
-
-
-function ShowInListBox(myData) {
-    
-    var myElement = document.getElementById("listOutputProducts");
-    
-	// clear the list
-	myElement.innerHTML = "";
-
-    // load the JSON into an object
-    var json = myData,
-    obj = JSON.parse(json);
-
-    // loop thru the object and populate list
-    for (var i = 0, l = obj.products.vmp.length; i < l; i++) {
-        var oProduct = obj.products.vmp[i];
-        option = document.createElement("option");
-        option.text =  oProduct["description"].toString();
-        option.title = oProduct["id"].toString() + " | " + option.text;
-        myElement.add(option);
-    }
-    myElement.size = l;
-}
-
-function callGetProductsForm(divName) {
-
-    var sortOrder = "alpha";
-    if ( document.getElementById("so-divide").checked == true ) {
-        sortOrder = "divide";
-    }
-    
-    var outputType = "json";
-    if ( document.getElementById("ot-xml").checked == true ) {
-        outputType = "xml";
-    }
-    
-    document.getElementById(divName).innerHTML = "Calling web services...";
-    
-   var myElement = document.getElementById("dosage");
-   var uri = "getProducts.php?so=" + sortOrder + "&ot=" + outputType + "&d=" + encodeURIComponent(myElement.value);
-   var xmlhttp = new XMLHttpRequest();
-   xmlhttp.onreadystatechange = function() {
-       if (this.readyState == 4 && this.status == 200) {
-           //alert(this.responseText);
-           document.getElementById(divName).innerHTML = this.responseText;
-           ShowInListBox(this.responseText);
-       } else {
-           document.getElementById(divName).innerHTML += "\r readyState=" + this.readyState + " status=" + this.status;
-       }
-   };
-   xmlhttp.open("GET", uri, true);
-   xmlhttp.send();
-}
-
-function callGetDosageTextForm(out,divName) {
-
-    document.getElementById(divName).innerHTML = "Calling web service...";
-    var myElement = document.getElementById("dosage");
-    //var uri = 'http://ec2-18-130-128-118.eu-west-2.compute.amazonaws.com/getDosageText.php?o=' + out + '&d=' + encodeURIComponent(myElement.value);
-    var uri = "getDosageText.php?o=" + out + "&d=" + encodeURIComponent(myElement.value);
-    //document.getElementById(divName).innerHTML = uri;
-    var xmlhttp = new XMLHttpRequest();
-    xmlhttp.onreadystatechange = function() {
-        if (this.readyState == 4 && this.status == 200) {
-            document.getElementById(divName).innerHTML = this.responseText;
-        } else {
-            document.getElementById(divName).innerHTML += "<br/>" + "readystate=" + this.readyState + "/status=" + this.status;
-        }
-    };
-    xmlhttp.open("GET", uri, true);
-    xmlhttp.setRequestHeader('Access-Control-Allow-Headers', '*');
-    xmlhttp.setRequestHeader('Access-Control-Allow-Origin', '*');
-    xmlhttp.setRequestHeader("Content-type", "text/plain");
-    xmlhttp.send();
-
-}
-
-function showExample() {
-    var uri = document.getElementById("examplesList").value;
-    if ( uri > "" ) {
-        xmlhttp = new XMLHttpRequest();
-        xmlhttp.open('GET', uri, false);
-        xmlhttp.send();
-        document.getElementById("dosage").value = xmlhttp.responseText;
-    } else {
-        document.getElementById("dosage").value = "";
-    }
-}
-
-</script>
-
 <body>
     
-<h1>Project MILK: Medicines Interoperability and Logic Toolkit</h1>
-
-<p>Web services for demonstration or experimental use only. Subject to change without notice. Read the <a href="#relNotes">Release Notes</a>.</p>
-
-<div class="container">
-    <div class="row">
-        <div class="col-sm">
-            <h2>FHIR Source XML Data</h2>
-        </div>
-    </div>
-    <div class="row cols-sm-6">
-        <div>
-			<p>Copy/paste any of the <a href="https://developer.nhs.uk/apis/dose-syntax-implementation/dosage-examples-overview.html">examples</a> from the Dose Syntax Implementation Guidance, or just type valid FHIR XML into the box below.</p>
-            <p><textarea style="font-size:smaller;width:100%;" rows="12" name="dosage" id="dosage"></textarea></p>
-			<p>Read the offical <a href="http://hl7.org/fhir/stu3/dosage.html#Dosage">STU3 Dosage</a> structure documentation.</p>
-        </div>
-        <div>
-            <p>Or pick from one of these examples:</p>
-            <select name="examplesList" id="examplesList" onChange='showExample();'>
-                <option value="">(clear)</option>
-                <option value="https://gist.githubusercontent.com/RobertGoochUK/2b88fe64156c2d3c788328463d7a4a5d/raw/">[Product] Oxytetracycline, oral</option>
-                <option value="https://gist.githubusercontent.com/RobertGoochUK/3d90859ce98769ec9b6643cfccdcc65a/raw/">[Dose] Oxytetracycline, oral</option>
-                <option value="https://gist.githubusercontent.com/RobertGoochUK/b80afd58861658643c8265d3cb622979/raw/">[Product] Omeprazole, gastro-resistant, oral</option>
-                <option value="https://gist.githubusercontent.com/RobertGoochUK/3058adde9517ffb68a62f55112e036f0/raw/">[Dose] Salbutamol, inhalation</option>
-                <option value="https://gist.githubusercontent.com/RobertGoochUK/17e0acb88b76bbcb82b3b6f6c34d7f31/raw/">[Dose] Flucloxacillin, oral</option>
-                <option value="https://gist.githubusercontent.com/RobertGoochUK/94b057717c3ade14ae6d6227bd52c213/raw/">[Dose] Prednisolone, tapered</option>
-            </select>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-sm">
-            <h2>Web Service: getDosageText</h2>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-sm">
-<p>Returns an appropriate human readable dosage string generated from the given FHIR Dosage structure.</p>
-<p>Use to populate the .text structure within profiled resources like <a href="https://fhir.hl7.org.uk/STU3/StructureDefinition/CareConnect-MedicationRequest-1">CareConnect-MedicationRequest-1</a> as per this example.</p>
-		</div>
-        <div class="col-sm">
-            <small><b>Example FHIR XML</b></small></br>
-            <script src="https://gist.github.com/RobertGoochUK/95ecc87683173d4ceeb4d9119d8094bd.js"></script>
-        </div>
-	</div>
-    <div class="row">
-        
-    </div>
-	<div class="row">
-		<div class="col-sm-2">     
-			<button class="primary small" type="button" onclick="callGetDosageTextForm('text','divOutputBox')">Plain Text</button>
-		</div>
-		<div class="col-sm"> 
-			<pre>{base_url}/getDosageText.php?o=text&d={urlencoded FHIR XML}</pre>
-		</div>
-    </div>
-	<div class="row">
-		<div class="col-sm">     
-            <div name="divOutputBox" id="divOutputBox" class="outputBox"></div>
-        </div>
-	</div>
-    <div class="row">
-        <div class="col-sm">
-            <h4>This web service can also return with HTML mark-up</h4>
-            <p>Now execute the web service and request a formatted HTML response aligned with CUI guidance.</p>
-		</div>
-    </div>
-    <div class="row">
-		<div class="col-sm-2">     
-			<button class="primary small" type="button" onclick="callGetDosageTextForm('html','divOutputCUIBox1')">HTML Multi Line</button>
-		</div>
-		<div class="col-sm"> 
-			<pre>{base_url}/getDosageText.php?o=html&d={urlencoded FHIR XML}</pre>
-		</div>
-	</div>
-	<div class="row">
-		<div class="col-sm"> 
-			<div name="divOutputCUIBox1" id="divOutputCUIBox1" class="outputCUIBox"></div>
-		</div>
-	</div>
-	<div class="row">
-		<div class="col-sm-2">
-			<button class="primary small" type="button" onclick="callGetDosageTextForm('htmlinline','divOutputCUIBox2')">HTML Single Line</button>
-		</div>
-		<div class="col-sm">
-			<pre>{base_url}/getDosageText.php?o=htmlinline&d={urlencoded FHIR XML}</pre>
-		</div>
-	</div>
-	<div class="row">
-		<div class="col-sm">
-			<div name="divOutputCUIBox2" id="divOutputCUIBox2" class="outputCUIBox"></div>
-		</div>            
-    </div>
-	
-    <div class="row">
-        <div class="col-sm">
-            <h2>Web Service: getProducts (stubbed)</h2>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-sm">
-            <p>Return a list of VMP or AMP concepts (name + id) that could fulfil the given dose-based instruction comprising of at least a VTM and coded Route, plus optional data of a coded Form, Trade Family SNOMED code and dose strength quantity and unit of measure. The returned list can be sorted alphabetically or in order of least divisiblity, i.e. least quantity of the product to meet the ordered dose strength. Any additional filtering subject to local requirements, e.g. stock availability, formulary etc. It is not intended that this process auto-selects a single product. A human will ultimately decide on which product to use to fulfil the clinical need.</p>
-        </div>
-    </div>
-    <div class="row">
-        <div class="cols-sm-6">
-			<div class="input-group">
-                <button class="primary" type="button" onclick="callGetProductsForm('divOutputProducts')">Execute</button>
-				<label for="ot">Output Type (ot):</label>
-				<input type="radio" id="ot-json" name="ot" value="json" checked>json</input>
-				<input type="radio" id="ot-xml" name="ot" value="xml">xml</input>
-				<label for="ot">Sort Order (so):</label>
-				<input type="radio" id="so-alpha" name="so" value="alpha" checked>alphabetical</input>
-				<input type="radio" id="so-divide" name="so" value="divide">least divisibility</input>
-			</div>
-		</div>
-		<div class="cols-sm-6">
-			<pre>{base_url}/getProducts.php?ot={output_type}&so={sort_order}&d={urlencoded FHIR XML}</pre>
-		</div>
-	</div>
-	<div class="row">
-        <div class="col-sm-6">
-            <p><b>Shortlist of Products</b> (suitable for further local filtering):</p>
-            <select id="listOutputProducts" style="width:100%;"></select>
-        </div>
-        <div class="col-sm-6">
-            <p><b>Raw Output</b> (from web serice):</p>
-            <textarea style="font-size:smaller;width:100%;" rows="10" name="divOutputProducts" id="divOutputProducts"></textarea>
-        </div>
-    </div>
-
-	<!-- HERE -->
-
-    <div class="row">
-        <div class="col-sm">
-            <h2>Web Service: medicationResource (currently limited to VTM and VMP concepts)</h2>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-sm">
-<p>Return a complete <a href="https://fhir.hl7.org.uk/STU3/StructureDefinition/CareConnect-Medication-1">CareConnect-Medication-1</a> FHIR resource as either XML or JSON.</p>
-<p>This web service could be used to reference a medication resource within another resource as per this example.</p>
-<p>Web service currently only returns the concept name. For a VMP, the form and ingredients will be supported in a future version. AMP concepts will be supported in a future version.</p>
-        </div>
-        <div class="col-sm">
-            <small><b>Example FHIR XML</b></small></br>
-            <script src="https://gist.github.com/RobertGoochUK/b225dd212fdf062a0a76c7ec6dc0bf0a.js"></script>
-        </div>
-    </div>
-    <div class="row">
-        <div class="cols-sm-6">
-			<div class="input-group">
-                <button class="primary" type="button" onclick="callGetMedicationResource('divOutputResource')">Execute</button>
-				<label for="exampleConceptsList">Examples:</label>
-                <select name="exampleConceptsList" id="exampleConceptsList" onChange='document.getElementById("concept_id").value = this.value;'>
-                    <option value="">(clear)</option>
-                    <option value="25673006">[VTM] Omeprazole</option>
-                    <option value="317297007">[VMP] Omeprazole 10mg gastro-resistant capsules</option>
-                    <option value="24351311000001108">[VMP] Omeprazole 10mg/5ml oral solution</option>
-                    <option value="64411000001103" disabled>[AMP] Losec 10mg gastro-resistant capsules (AstraZeneca UK Ltd)</option>
-                </select>
-                <label for="concept_id">Concept id:</label>
-				<input type="number" name="concept_id" id="concept_id" autocomplete="off"></input>
-				<br/>
-                <label for="ot3">Output Type (ot):</label>
-				<input type="radio" id="ot3-json" name="ot3" value="json" checked>json</input>
-				<input type="radio" id="ot3-xml" name="ot3" value="xml">xml</input>
-                <pre>{base_url}/fhir/stu3/medicationResource.php?id={concept_id}&ot={output_type}</pre>
-			</div>
-		</div>
-		<div class="cols-sm-6">
-			
-		</div>
-	</div>
-    <div class="row">
-		<p><b>Raw Output</b> (from web service):</p>
-		<textarea style="font-size:smaller;width:100%;" rows="6" name="divOutputResource" id="divOutputResource"></textarea>
-	</div>
+    <header class="sticky" style="background:#005EB8;">
+        <a href="index.html" class="logo" style="color:white;">MILK</a>
+        <a href="dosage.html" class="button">FHIR Dosage-to-Text</a>
+        <a href="dosetranslation.html" class="button">Dose-to-Product Translation</a>
+        <a href="termserver.html" class="button"><img src="img/DMD_logo.png" style="width:60px;position: relative;top:4px;"/> Terminology Server</a>
+    </header>
     
-	<!-- Release Notes -->
-	
-    <a name="relNotes"></a>
-    <div class="row card">
-        <h4>Release Notes</h4>
-        <div class="card">
-            <div class="section dark">Alpha v1.0.9</div>
-            <div class="section"><small><b>Change History</b>: Included support for 'boundsPeriod' timing instructions. Web service 'medicationResource' now functional for VTM and VMP concepts but only returns concept name. VMP form and ingredients will be supported in a future version.</small></div>
-        </div>
-        <div class="card">
-            <div class="section dark">Alpha v1.0.8</div>
-            <div class="section"><small><b>Change History</b>: Visual improvements</small></div>
-        </div>
-        <div class="card">
-            <div class="section dark">Alpha v1.0.7</div>
-            <div class="section">
-            <small><b>Change History</b>: Last two repeatable clauses now separated with 'and', e.g. "at 10:00, 12:00 and 14:00". HTML Single Line output for multi-sequence instructions now working. </small>
-            <br/>
-            <small><b>Known Issues</b>: Not all the special cases for frequency[max] and period[Max] are correctly being handled. The getProducts and getConcept functions are still stubbed.</small>
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12">
+                <h2>Project MILK (Medicines Interoperability and Logic Toolkit)</h2>
             </div>
         </div>
-        <div class="card">
-            <div class="section dark">Alpha v1.0.6</div>
-            <div class="section">
-            <small><b>Change History</b>: Minor changes to logic</small>
-            <br/>
-            <small><b>Known Issues</b>: HTML Single Line output for multi-sequence instructions not working.</small>
+        <div class="row">
+            <div class="col-sm-12">
+                <p>What tickles your fancy today..? Read the <a href="#relNotes">Release Notes</a>.</p>
             </div>
         </div>
-        <div class="card">
-            <div class="section dark">Alpha v1.0.5</div>
-            <div class="section">
-            <small><b>Change History</b>: Function getDosageText now as a true web service.</small>
-            <br/>
-            <small><b>Known Issues</b>: HTML Single Line output for multi-sequence instructions not working.</small>
+        <div class="row">
+            <div class="card large">
+                <div class="section" style="background:#E5EFF8;">
+                    <h3>FHIR Dosage-to-Text</h3>
+                    <h4>Demonstrator web services to support the implementation of the <a href="http://hl7.org/fhir/stu3/dosage.html#Dosage">FHIR STU3 Dosage structure<a/> within <a href="https://nhsconnect.github.io/CareConnectAPI/index.html">CareConnect</a> profiled resources, to convert a structured dosage instruction into a human readable string.</h4>
+                </div>
+                <div class="section">
+                    <div class="row">
+                        <div class="col-sm-9"><button class="tertiary large shadowed" onclick="location.href='dosage.html';">Launch</button></div>
+                    </div>
+                </div>
+            </div>
+            <div class="card large">
+                <div class="section" style="background:#E5EFF8;">
+                    <h3>Dose-to-Product Translation</h3>
+                    <h4>Demonstrator web services using the <a href="https://www.nhsbsa.nhs.uk/pharmacies-gp-practices-and-appliance-contractors/dictionary-medicines-and-devices-dmd">NHS Dictionary of Medicines and Devices (dm+d)</a> terminology to translation a dose-based instruction into a list of suitable products.</h4>
+                </div>
+                <div class="section">
+                    <div class="row">
+                        <div class="col-sm"><button class="tertiary large shadowed" onclick="location.href='dosetranslation.html';">Launch</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card large">
+                <div class="section" style="background:#E5EFF8;">
+                    <h3>dm+d Terminology Server</h3>
+                    <h4>Demonstrator web services for integration with the <a href="https://www.nhsbsa.nhs.uk/pharmacies-gp-practices-and-appliance-contractors/dictionary-medicines-and-devices-dmd">NHS Dictionary of Medicines and Devices (dm+d)</a> terminology to return dm+d information.</h4>
+                </div>
+                <div class="section">
+                    <div class="row">
+                        <div class="col-sm-9"><button class="tertiary large shadowed" onclick="location.href='termserver.html';">Launch</button></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Release Notes -->
+        
+        <a name="relNotes"></a>
+        <div class="row card">
+            <h4>Release Notes</h4>
+            <div class="card">
+                <div class="section dark">Alpha v1.1.00</div>
+                <div class="section"><small><b>Change History</b>: Web services split into three logical groups (top menu). Dose-to-product web service improvements including consideration of divisible/non-divisable dose forms. Ability to hide/show developer information to de-clutter interface for the non-technical audience.</small>
+                </div>
+            </div>
+            <div class="card">
+                <div class="section dark">Alpha v1.0.12</div>
+                <div class="section"><small><b>Change History</b>: When UoM is 'tablet' express 0.5 as 'half a tablet' and 0.25 as 'quarter of a tablet'. Extended logic for dose-to-product conversion to include dose strength based on either 'doseQuantity' or 'doseRange.low'.</small>
+                </div>
+            </div>
+            <div class="card">
+                <div class="section dark">Alpha v1.0.11</div>
+                <div class="section"><small><b>Change History</b>: Visual improvements to logically split the dose syntax web services from the dm+d terminology services.</small>
+                </div>
+            </div>
+            <div class="card">
+                <div class="section dark">Alpha v1.0.10</div>
+                <div class="section"><small><b>Change History</b>: Web service 'getProducts' now functional for VTM-to-VMP, Form and Route. More visual improvements.</small>
+                </div>
+            </div>
+            <div class="card">
+                <div class="section dark">Alpha v1.0.9</div>
+                <div class="section"><small><b>Change History</b>: Included support for 'boundsPeriod' timing instructions. Web service 'medicationResource' now functional for VTM and VMP concepts excluding active ingredient information.</small>
+                </div>
+            </div>
+            <div class="card">
+                <div class="section dark">Alpha v1.0.8</div>
+                <div class="section"><small><b>Change History</b>: Visual improvements</small></div>
+            </div>
+            <div class="card">
+                <div class="section dark">Alpha v1.0.7</div>
+                <div class="section">
+                    <small><b>Change History</b>: Last two repeatable clauses now separated with 'and', e.g. "at 10:00, 12:00 and 14:00". HTML Single Line output for multi-sequence instructions now working. </small>
+                    <br/>
+                    <small><b>Known Issues</b>: Not all the special cases for frequency[max] and period[Max] are correctly being handled. The getProducts and getConcept functions are still stubbed.</small>
+                </div>
+            </div>
+            <div class="card">
+                <div class="section dark">Alpha v1.0.6</div>
+                <div class="section">
+                    <small><b>Change History</b>: Minor changes to logic</small>
+                    <br/>
+                    <small><b>Known Issues</b>: HTML Single Line output for multi-sequence instructions not working.</small>
+                </div>
+            </div>
+            <div class="card">
+                <div class="section dark">Alpha v1.0.5</div>
+                <div class="section">
+                    <small><b>Change History</b>: Function getDosageText now as a true web service.</small>
+                    <br/>
+                    <small><b>Known Issues</b>: HTML Single Line output for multi-sequence instructions not working.</small>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
-
-<footer class="sticky">
-MILK Experimental Web Services - <mark class="secondary">Alpha v1.0.9</mark> - Source code on <a href="https://github.com/RobertGoochUK/milk">GitHub</a> - Join the <a href="https://interopen.ryver.com/index.html#forums/1276343">INTEROPen discussion</a>
-</footer>
+    <footer class="sticky">
+        MILK Experimental Web Services - <mark class="secondary">Alpha v1.1.0</mark> - Source code on <a href="https://github.com/RobertGoochUK/milk">GitHub</a> - Join the <a href="https://interopen.ryver.com/index.html#forums/1276343">INTEROPen discussion</a>
+    </footer>
 
 </body>
 </html>
